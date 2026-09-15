@@ -1,0 +1,98 @@
+# Terminus 3 — Multi-Language Task Ideation Prompt (Rust / Python / Java / Go)
+
+You are an expert Terminus 3 task designer, authoring for Terminal-Bench 3.0.
+
+## Language constraint
+
+⚠️ Note on Bash: it is not one of the nine approved `languages` values (Python, C, C++,
+JavaScript, TypeScript, Java, Go, Rust, C#). Bash is still used as glue — `solution/solve.sh`
+and `tests/test.sh` are always bash regardless of the task's primary language — but do not
+list it in `task.toml`'s `languages` field.
+
+Primary language candidates for this task, drawn from: **Rust, Python, Java, Go**.
+
+Per Task Requirements, multi-language tasks are *preferred*. Do not pick one of these four and
+treat the others as unused options — generate topics where **at least two of the four interact
+non-trivially**: one language's component produces something the other must correctly consume,
+call, validate, or repair. A task that merely happens to be "written in Rust" with Python/Java/Go
+absent is a valid fallback only if nothing multi-language fits the chosen domain well.
+
+Good interaction shapes to consider (not an exhaustive list):
+- A compiled component (Rust or Go) exposed via FFI/CLI/socket that a Python or Java layer calls,
+  where a defect in the compiled side produces subtly wrong behavior the calling side must diagnose
+- A build/serialization boundary — one language's struct/schema must stay binary- or
+  wire-compatible with another's after a change, and the task is to restore that compatibility
+- A performance-critical path implemented in Rust or Go, orchestrated by Python or Java, where
+  the defect only appears under the interaction (timing, memory ownership, serialization) not in
+  either language alone
+
+## Step 1 — Pick category and subcategory
+
+Choose exactly ONE category and ONE subcategory from the real taxonomy (Title Case, exact
+category match; subcategory is an open list — use the taxonomy's conventional value):
+
+- **Science** — Biology, Chemistry, Physics, Earth, Robotics, Math, Linguistics
+- **Software** — Algorithms, Systems, Databases, Data engineering, Frontend, Languages
+- **ML** — Training, Inference, Evaluation, Kernels
+- **Operations** — Finance, Logistics, Supply chain, Claims, Compliance, Marketing
+- **Security** — Cryptography, Reverse engineering, Forensics, AppSec
+- **Hardware** — CAD, RTL
+- **Media** — Music, Design
+
+Selection rule: ask "what does the agent have to understand to get this right?" — not "does it
+involve code." A cross-language systems bug is Software/Systems; a cross-language numerical
+pipeline for a scientific computation is Science/whichever field owns the computation; a
+cross-language trading/risk system is Operations/Finance. The languages are the implementation,
+not the domain — pick category based on the domain knowledge the agent needs, independent of
+which languages happen to be involved.
+
+## Step 2 — Generate 3 original topics
+
+Each topic must:
+- Be realistic and novel — not a variation of any Terminal-Bench 2.1, Terminal-Bench 3.0, prior
+  Terminus edition, or Terminal Bench Edition 1 task
+- Genuinely involve at least two of Rust/Python/Java/Go interacting (per the shapes above), unless
+  a strong single-language case is made for why multi-language doesn't fit this domain
+- Involve **repairing a broken implementation**, not building from scratch
+- Require multi-step reasoning across the language boundary — not solvable by fixing one side in
+  isolation
+- Have a specification partly **inferred** from evidence (a schema, protocol doc, failing
+  cross-language test, wire format) rather than stated as a checklist
+- Combine at least two **interacting** correctness axes (e.g., cross-language correctness +
+  performance, or serialization compatibility + safety)
+- Be gradeable by a deterministic, semantic verifier
+
+For each topic, provide:
+- Topic name
+- One-paragraph scenario — name which languages are involved and how they interact
+- Why it's difficult — map to the six properties (spec inferred, output semantics, multidimensional
+  correctness, interacting constraints, state as part of the problem, hidden checks)
+- Expected debugging/reasoning challenges, specifically at the language boundary
+- Rough difficulty guess (Frontier/Advanced/Core/Base) — to be confirmed empirically, not assumed
+- Which languages go in `task.toml`'s `languages` field (from Rust/Python/Java/Go only — omit Bash)
+
+## Step 3 — Compare and select
+
+1. Reject any topic that's hard mainly due to ambiguity, unrelated-requirement pileup, obscure
+   trivia, or non-determinism.
+2. Check early warning signs:
+   - Too easy: single-step solution, common tutorial topic, simple API usage, pattern matching
+     suffices — or the "multi-language" framing is cosmetic (only one language does real work)
+   - Too hard/unfair: requires unavailable information, environment unreliable, success depends
+     on luck, requirements contradictory
+3. Select the strongest candidate.
+4. Explain why — cite which properties it satisfies most strongly, and specifically why the
+   cross-language interaction is load-bearing rather than decorative.
+
+## Output
+
+End with:
+- The 3 topics, compared side by side
+- The selected topic, with full justification
+- Locked `category`/`subcategory`
+- Locked `languages` list for `task.toml` (Rust/Python/Java/Go subset only)
+- Confirmation that Bash will appear only inside `solution/solve.sh` and `tests/test.sh`, not in
+  the `languages` field
+
+Once this is locked, proceed to Phase B (design against the six properties) and Phase C (build)
+in `docs/terminus-3-full-prompt.md`.
