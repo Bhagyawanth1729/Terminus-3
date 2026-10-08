@@ -1,0 +1,1089 @@
+{
+  "schema_version": 1,
+  "generation": 41,
+  "sources": [
+    {
+      "name": "bootstrap",
+      "revision": 41,
+      "digest": ""
+    }
+  ],
+  "defaults": {
+    "connect_timeout_ms": 1500,
+    "request_timeout_ms": 8000,
+    "drain_timeout_ms": 15000,
+    "health_interval_ms": 1000,
+    "health_timeout_ms": 250,
+    "affinity_ttl_seconds": 300,
+    "affinity_capacity": 4096
+  },
+  "routes": [
+    {
+      "id": "route-001",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-001",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-01",
+      "failover_pools": ["pool-06"],
+      "retry": {
+        "attempts": 4,
+        "per_try_timeout_ms": 1500,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {
+        "mode": "header",
+        "header": "X-Session-Key",
+        "ttl_seconds": 300,
+        "capacity": 4096
+      },
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "route-002",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-002",
+      "methods": ["POST"],
+      "pool": "pool-02",
+      "failover_pools": ["pool-07"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1500,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 99
+    },
+    {
+      "id": "route-003",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-003",
+      "methods": ["GET"],
+      "pool": "pool-03",
+      "failover_pools": ["pool-08"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1500,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 98
+    },
+    {
+      "id": "route-004",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-004",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-04",
+      "failover_pools": ["pool-09"],
+      "retry": {
+        "attempts": 4,
+        "per_try_timeout_ms": 1500,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 97
+    },
+    {
+      "id": "route-005",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-005",
+      "methods": ["DELETE"],
+      "pool": "pool-05",
+      "failover_pools": ["pool-10"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1500,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 96
+    },
+    {
+      "id": "route-006",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-006",
+      "methods": ["GET", "POST"],
+      "pool": "pool-06",
+      "failover_pools": ["pool-11"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 95
+    },
+    {
+      "id": "route-007",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-007",
+      "methods": ["GET"],
+      "pool": "pool-07",
+      "failover_pools": ["pool-12"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "gold"}],
+      "priority": 94
+    },
+    {
+      "id": "route-008",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-008",
+      "methods": ["POST"],
+      "pool": "pool-08",
+      "failover_pools": ["pool-13"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 93
+    },
+    {
+      "id": "route-009",
+      "hosts": ["*"],
+      "path_prefix": "/api/v1/resource-009",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-09",
+      "failover_pools": ["pool-14"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 92
+    },
+    {
+      "id": "route-010",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-010",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-10",
+      "failover_pools": ["pool-15"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 91
+    },
+    {
+      "id": "route-011",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-011",
+      "methods": ["DELETE"],
+      "pool": "pool-11",
+      "failover_pools": ["pool-16"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "route-012",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-012",
+      "methods": ["GET", "POST"],
+      "pool": "pool-12",
+      "failover_pools": ["pool-01"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 99
+    },
+    {
+      "id": "route-013",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-013",
+      "methods": ["GET"],
+      "pool": "pool-13",
+      "failover_pools": ["pool-02"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 98
+    },
+    {
+      "id": "route-014",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-014",
+      "methods": ["POST"],
+      "pool": "pool-14",
+      "failover_pools": ["pool-03"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "silver"}],
+      "priority": 97
+    },
+    {
+      "id": "route-015",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-015",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-15",
+      "failover_pools": ["pool-04"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 96
+    },
+    {
+      "id": "route-016",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-016",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-16",
+      "failover_pools": ["pool-05"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 95
+    },
+    {
+      "id": "route-017",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-017",
+      "methods": ["DELETE"],
+      "pool": "pool-01",
+      "failover_pools": ["pool-06"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 94
+    },
+    {
+      "id": "route-018",
+      "hosts": ["*"],
+      "path_prefix": "/api/v2/resource-018",
+      "methods": ["GET", "POST"],
+      "pool": "pool-02",
+      "failover_pools": ["pool-07"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 93
+    },
+    {
+      "id": "route-019",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-019",
+      "methods": ["GET"],
+      "pool": "pool-03",
+      "failover_pools": ["pool-08"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 92
+    },
+    {
+      "id": "route-020",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-020",
+      "methods": ["POST"],
+      "pool": "pool-04",
+      "failover_pools": ["pool-09"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 91
+    },
+    {
+      "id": "route-021",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-021",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-05",
+      "failover_pools": ["pool-10"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "bronze"}],
+      "priority": 100
+    },
+    {
+      "id": "route-022",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-022",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-06",
+      "failover_pools": ["pool-11"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 99
+    },
+    {
+      "id": "route-023",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-023",
+      "methods": ["DELETE"],
+      "pool": "pool-07",
+      "failover_pools": ["pool-12"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 98
+    },
+    {
+      "id": "route-024",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-024",
+      "methods": ["GET", "POST"],
+      "pool": "pool-08",
+      "failover_pools": ["pool-13"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 97
+    },
+    {
+      "id": "route-025",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-025",
+      "methods": ["GET"],
+      "pool": "pool-09",
+      "failover_pools": ["pool-14"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 96
+    },
+    {
+      "id": "route-026",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-026",
+      "methods": ["POST"],
+      "pool": "pool-10",
+      "failover_pools": ["pool-15"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 95
+    },
+    {
+      "id": "route-027",
+      "hosts": ["*"],
+      "path_prefix": "/api/v3/resource-027",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-11",
+      "failover_pools": ["pool-16"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 94
+    },
+    {
+      "id": "route-028",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-028",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-12",
+      "failover_pools": ["pool-01"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "gold"}],
+      "priority": 93
+    },
+    {
+      "id": "route-029",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-029",
+      "methods": ["DELETE"],
+      "pool": "pool-13",
+      "failover_pools": ["pool-02"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 92
+    },
+    {
+      "id": "route-030",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-030",
+      "methods": ["GET", "POST"],
+      "pool": "pool-14",
+      "failover_pools": ["pool-03"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 91
+    },
+    {
+      "id": "route-031",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-031",
+      "methods": ["GET"],
+      "pool": "pool-15",
+      "failover_pools": ["pool-04"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "route-032",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-032",
+      "methods": ["POST"],
+      "pool": "pool-16",
+      "failover_pools": ["pool-05"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 99
+    },
+    {
+      "id": "route-033",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-033",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-01",
+      "failover_pools": ["pool-06"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 98
+    },
+    {
+      "id": "route-034",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-034",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-02",
+      "failover_pools": ["pool-07"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 97
+    },
+    {
+      "id": "route-035",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-035",
+      "methods": ["DELETE"],
+      "pool": "pool-03",
+      "failover_pools": ["pool-08"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "silver"}],
+      "priority": 96
+    },
+    {
+      "id": "route-036",
+      "hosts": ["*"],
+      "path_prefix": "/api/v4/resource-036",
+      "methods": ["GET", "POST"],
+      "pool": "pool-04",
+      "failover_pools": ["pool-09"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 95
+    },
+    {
+      "id": "route-037",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-037",
+      "methods": ["GET"],
+      "pool": "pool-05",
+      "failover_pools": ["pool-10"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 94
+    },
+    {
+      "id": "route-038",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-038",
+      "methods": ["POST"],
+      "pool": "pool-06",
+      "failover_pools": ["pool-11"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 93
+    },
+    {
+      "id": "route-039",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-039",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-07",
+      "failover_pools": ["pool-12"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 92
+    },
+    {
+      "id": "route-040",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-040",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-08",
+      "failover_pools": ["pool-13"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 91
+    },
+    {
+      "id": "route-041",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-041",
+      "methods": ["DELETE"],
+      "pool": "pool-09",
+      "failover_pools": ["pool-14"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "route-042",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-042",
+      "methods": ["GET", "POST"],
+      "pool": "pool-10",
+      "failover_pools": ["pool-15"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "bronze"}],
+      "priority": 99
+    },
+    {
+      "id": "route-043",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-043",
+      "methods": ["GET"],
+      "pool": "pool-11",
+      "failover_pools": ["pool-16"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 98
+    },
+    {
+      "id": "route-044",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-044",
+      "methods": ["POST"],
+      "pool": "pool-12",
+      "failover_pools": ["pool-01"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 97
+    },
+    {
+      "id": "route-045",
+      "hosts": ["*"],
+      "path_prefix": "/api/v1/resource-045",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-13",
+      "failover_pools": ["pool-02"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 96
+    },
+    {
+      "id": "route-046",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-046",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-14",
+      "failover_pools": ["pool-03"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 95
+    },
+    {
+      "id": "route-047",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-047",
+      "methods": ["DELETE"],
+      "pool": "pool-15",
+      "failover_pools": ["pool-04"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 94
+    },
+    {
+      "id": "route-048",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-048",
+      "methods": ["GET", "POST"],
+      "pool": "pool-16",
+      "failover_pools": ["pool-05"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 93
+    },
+    {
+      "id": "route-049",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-049",
+      "methods": ["GET"],
+      "pool": "pool-01",
+      "failover_pools": ["pool-06"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "gold"}],
+      "priority": 92
+    },
+    {
+      "id": "route-050",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-050",
+      "methods": ["POST"],
+      "pool": "pool-02",
+      "failover_pools": ["pool-07"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 91
+    },
+    {
+      "id": "route-051",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-051",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-03",
+      "failover_pools": ["pool-08"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "route-052",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-052",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-04",
+      "failover_pools": ["pool-09"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 99
+    },
+    {
+      "id": "route-053",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-053",
+      "methods": ["DELETE"],
+      "pool": "pool-05",
+      "failover_pools": ["pool-10"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 98
+    },
+    {
+      "id": "route-054",
+      "hosts": ["*"],
+      "path_prefix": "/api/v2/resource-054",
+      "methods": ["GET", "POST"],
+      "pool": "pool-06",
+      "failover_pools": ["pool-11"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 97
+    },
+    {
+      "id": "route-055",
+      "hosts": ["service-7.example.internal"],
+      "path_prefix": "/api/v3/resource-055",
+      "methods": ["GET"],
+      "pool": "pool-07",
+      "failover_pools": ["pool-12"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 96
+    },
+    {
+      "id": "route-056",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-056",
+      "methods": ["POST"],
+      "pool": "pool-08",
+      "failover_pools": ["pool-13"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "silver"}],
+      "priority": 95
+    },
+    {
+      "id": "route-057",
+      "hosts": ["service-1.example.internal"],
+      "path_prefix": "/api/v1/resource-057",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-09",
+      "failover_pools": ["pool-14"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 94
+    },
+    {
+      "id": "route-058",
+      "hosts": ["service-2.example.internal"],
+      "path_prefix": "/api/v2/resource-058",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-10",
+      "failover_pools": ["pool-15"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 93
+    },
+    {
+      "id": "route-059",
+      "hosts": ["service-3.example.internal"],
+      "path_prefix": "/api/v3/resource-059",
+      "methods": ["DELETE"],
+      "pool": "pool-11",
+      "failover_pools": ["pool-16"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 92
+    },
+    {
+      "id": "route-060",
+      "hosts": ["service-4.example.internal"],
+      "path_prefix": "/api/v4/resource-060",
+      "methods": ["GET", "POST"],
+      "pool": "pool-12",
+      "failover_pools": ["pool-01"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 91
+    },
+    {
+      "id": "route-061",
+      "hosts": ["service-5.example.internal"],
+      "path_prefix": "/api/v1/resource-061",
+      "methods": ["GET"],
+      "pool": "pool-13",
+      "failover_pools": ["pool-02"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "header", "header": "X-Session-Key", "ttl_seconds": 300, "capacity": 4096},
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "route-062",
+      "hosts": ["service-6.example.internal"],
+      "path_prefix": "/api/v2/resource-062",
+      "methods": ["POST"],
+      "pool": "pool-14",
+      "failover_pools": ["pool-03"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 99
+    },
+    {
+      "id": "route-063",
+      "hosts": ["*"],
+      "path_prefix": "/api/v3/resource-063",
+      "methods": ["GET", "HEAD"],
+      "pool": "pool-15",
+      "failover_pools": ["pool-04"],
+      "retry": {"attempts": 3, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Tenant-Class", "prefix": "bronze"}],
+      "priority": 98
+    },
+    {
+      "id": "route-064",
+      "hosts": ["service-8.example.internal"],
+      "path_prefix": "/api/v4/resource-064",
+      "methods": ["PUT", "PATCH"],
+      "pool": "pool-16",
+      "failover_pools": ["pool-05"],
+      "retry": {"attempts": 4, "per_try_timeout_ms": 1500, "retry_on": ["connect-error", "5xx", "reset"]},
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 97
+    }
+  ],
+  "pools": [
+    {
+      "id": "pool-01",
+      "strategy": "round_robin",
+      "endpoints": [
+        {"id": "ep-01-01", "address": "127.0.0.1:12001", "weight": 1, "zone": "az-a", "metadata": {"rack": "r1", "service": "svc-01"}},
+        {"id": "ep-01-02", "address": "127.0.0.1:12002", "weight": 2, "zone": "az-b", "metadata": {"rack": "r2", "service": "svc-01"}},
+        {"id": "ep-01-03", "address": "127.0.0.1:12003", "weight": 3, "zone": "az-c", "metadata": {"rack": "r3", "service": "svc-01"}},
+        {"id": "ep-01-04", "address": "127.0.0.1:12004", "weight": 1, "zone": "az-a", "metadata": {"rack": "r4", "service": "svc-01"}},
+        {"id": "ep-01-05", "address": "127.0.0.1:12005", "weight": 2, "zone": "az-b", "metadata": {"rack": "r5", "service": "svc-01"}},
+        {"id": "ep-01-06", "address": "127.0.0.1:12006", "weight": 3, "zone": "az-c", "metadata": {"rack": "r6", "service": "svc-01"}},
+        {"id": "ep-01-07", "address": "127.0.0.1:12007", "weight": 1, "zone": "az-a", "metadata": {"rack": "r7", "service": "svc-01"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1000, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 16, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-1", "tier": "frontend"}
+    },
+    {
+      "id": "pool-02",
+      "strategy": "weighted",
+      "endpoints": [
+        {"id": "ep-02-01", "address": "127.0.0.1:12008", "weight": 1, "zone": "az-a", "metadata": {"rack": "r8", "service": "svc-02"}},
+        {"id": "ep-02-02", "address": "127.0.0.1:12009", "weight": 2, "zone": "az-b", "metadata": {"rack": "r1", "service": "svc-02"}},
+        {"id": "ep-02-03", "address": "127.0.0.1:12010", "weight": 3, "zone": "az-c", "metadata": {"rack": "r2", "service": "svc-02"}},
+        {"id": "ep-02-04", "address": "127.0.0.1:12011", "weight": 1, "zone": "az-a", "metadata": {"rack": "r3", "service": "svc-02"}},
+        {"id": "ep-02-05", "address": "127.0.0.1:12012", "weight": 2, "zone": "az-b", "metadata": {"rack": "r4", "service": "svc-02"}},
+        {"id": "ep-02-06", "address": "127.0.0.1:12013", "weight": 3, "zone": "az-c", "metadata": {"rack": "r5", "service": "svc-02"}},
+        {"id": "ep-02-07", "address": "127.0.0.1:12014", "weight": 1, "zone": "az-a", "metadata": {"rack": "r6", "service": "svc-02"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1250, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 20, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-2", "tier": "api"}
+    },
+    {
+      "id": "pool-03",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {"id": "ep-03-01", "address": "127.0.0.1:12015", "weight": 1, "zone": "az-a", "metadata": {"rack": "r7", "service": "svc-03"}},
+        {"id": "ep-03-02", "address": "127.0.0.1:12016", "weight": 2, "zone": "az-b", "metadata": {"rack": "r8", "service": "svc-03"}},
+        {"id": "ep-03-03", "address": "127.0.0.1:12017", "weight": 3, "zone": "az-c", "metadata": {"rack": "r1", "service": "svc-03"}},
+        {"id": "ep-03-04", "address": "127.0.0.1:12018", "weight": 1, "zone": "az-a", "metadata": {"rack": "r2", "service": "svc-03"}},
+        {"id": "ep-03-05", "address": "127.0.0.1:12019", "weight": 2, "zone": "az-b", "metadata": {"rack": "r3", "service": "svc-03"}},
+        {"id": "ep-03-06", "address": "127.0.0.1:12020", "weight": 3, "zone": "az-c", "metadata": {"rack": "r4", "service": "svc-03"}},
+        {"id": "ep-03-07", "address": "127.0.0.1:12021", "weight": 1, "zone": "az-a", "metadata": {"rack": "r5", "service": "svc-03"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1500, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 24, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-3", "tier": "worker"}
+    },
+    {
+      "id": "pool-04",
+      "strategy": "round_robin",
+      "endpoints": [
+        {"id": "ep-04-01", "address": "127.0.0.1:12022", "weight": 1, "zone": "az-a", "metadata": {"rack": "r6", "service": "svc-04"}},
+        {"id": "ep-04-02", "address": "127.0.0.1:12023", "weight": 2, "zone": "az-b", "metadata": {"rack": "r7", "service": "svc-04"}},
+        {"id": "ep-04-03", "address": "127.0.0.1:12024", "weight": 3, "zone": "az-c", "metadata": {"rack": "r8", "service": "svc-04"}},
+        {"id": "ep-04-04", "address": "127.0.0.1:12025", "weight": 1, "zone": "az-a", "metadata": {"rack": "r1", "service": "svc-04"}},
+        {"id": "ep-04-05", "address": "127.0.0.1:12026", "weight": 2, "zone": "az-b", "metadata": {"rack": "r2", "service": "svc-04"}},
+        {"id": "ep-04-06", "address": "127.0.0.1:12027", "weight": 3, "zone": "az-c", "metadata": {"rack": "r3", "service": "svc-04"}},
+        {"id": "ep-04-07", "address": "127.0.0.1:12028", "weight": 1, "zone": "az-a", "metadata": {"rack": "r4", "service": "svc-04"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1750, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 28, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-4", "tier": "special"}
+    },
+    {
+      "id": "pool-05",
+      "strategy": "weighted",
+      "endpoints": [
+        {"id": "ep-05-01", "address": "127.0.0.1:12029", "weight": 1, "zone": "az-a", "metadata": {"rack": "r5", "service": "svc-05"}},
+        {"id": "ep-05-02", "address": "127.0.0.1:12030", "weight": 2, "zone": "az-b", "metadata": {"rack": "r6", "service": "svc-05"}},
+        {"id": "ep-05-03", "address": "127.0.0.1:12031", "weight": 3, "zone": "az-c", "metadata": {"rack": "r7", "service": "svc-05"}},
+        {"id": "ep-05-04", "address": "127.0.0.1:12032", "weight": 1, "zone": "az-a", "metadata": {"rack": "r8", "service": "svc-05"}},
+        {"id": "ep-05-05", "address": "127.0.0.1:12033", "weight": 2, "zone": "az-b", "metadata": {"rack": "r1", "service": "svc-05"}},
+        {"id": "ep-05-06", "address": "127.0.0.1:12034", "weight": 3, "zone": "az-c", "metadata": {"rack": "r2", "service": "svc-05"}},
+        {"id": "ep-05-07", "address": "127.0.0.1:12035", "weight": 1, "zone": "az-a", "metadata": {"rack": "r3", "service": "svc-05"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1000, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 16, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-1", "tier": "frontend"}
+    },
+    {
+      "id": "pool-06",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {"id": "ep-06-01", "address": "127.0.0.1:12036", "weight": 1, "zone": "az-a", "metadata": {"rack": "r4", "service": "svc-06"}},
+        {"id": "ep-06-02", "address": "127.0.0.1:12037", "weight": 2, "zone": "az-b", "metadata": {"rack": "r5", "service": "svc-06"}},
+        {"id": "ep-06-03", "address": "127.0.0.1:12038", "weight": 3, "zone": "az-c", "metadata": {"rack": "r6", "service": "svc-06"}},
+        {"id": "ep-06-04", "address": "127.0.0.1:12039", "weight": 1, "zone": "az-a", "metadata": {"rack": "r7", "service": "svc-06"}},
+        {"id": "ep-06-05", "address": "127.0.0.1:12040", "weight": 2, "zone": "az-b", "metadata": {"rack": "r8", "service": "svc-06"}},
+        {"id": "ep-06-06", "address": "127.0.0.1:12041", "weight": 3, "zone": "az-c", "metadata": {"rack": "r1", "service": "svc-06"}},
+        {"id": "ep-06-07", "address": "127.0.0.1:12042", "weight": 1, "zone": "az-a", "metadata": {"rack": "r2", "service": "svc-06"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1250, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 20, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-2", "tier": "api"}
+    },
+    {
+      "id": "pool-07",
+      "strategy": "round_robin",
+      "endpoints": [
+        {"id": "ep-07-01", "address": "127.0.0.1:12043", "weight": 1, "zone": "az-a", "metadata": {"rack": "r3", "service": "svc-07"}},
+        {"id": "ep-07-02", "address": "127.0.0.1:12044", "weight": 2, "zone": "az-b", "metadata": {"rack": "r4", "service": "svc-07"}},
+        {"id": "ep-07-03", "address": "127.0.0.1:12045", "weight": 3, "zone": "az-c", "metadata": {"rack": "r5", "service": "svc-07"}},
+        {"id": "ep-07-04", "address": "127.0.0.1:12046", "weight": 1, "zone": "az-a", "metadata": {"rack": "r6", "service": "svc-07"}},
+        {"id": "ep-07-05", "address": "127.0.0.1:12047", "weight": 2, "zone": "az-b", "metadata": {"rack": "r7", "service": "svc-07"}},
+        {"id": "ep-07-06", "address": "127.0.0.1:12048", "weight": 3, "zone": "az-c", "metadata": {"rack": "r8", "service": "svc-07"}},
+        {"id": "ep-07-07", "address": "127.0.0.1:12049", "weight": 1, "zone": "az-a", "metadata": {"rack": "r1", "service": "svc-07"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1500, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 24, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-3", "tier": "worker"}
+    },
+    {
+      "id": "pool-08",
+      "strategy": "weighted",
+      "endpoints": [
+        {"id": "ep-08-01", "address": "127.0.0.1:12050", "weight": 1, "zone": "az-a", "metadata": {"rack": "r2", "service": "svc-08"}},
+        {"id": "ep-08-02", "address": "127.0.0.1:12051", "weight": 2, "zone": "az-b", "metadata": {"rack": "r3", "service": "svc-08"}},
+        {"id": "ep-08-03", "address": "127.0.0.1:12052", "weight": 3, "zone": "az-c", "metadata": {"rack": "r4", "service": "svc-08"}},
+        {"id": "ep-08-04", "address": "127.0.0.1:12053", "weight": 1, "zone": "az-a", "metadata": {"rack": "r5", "service": "svc-08"}},
+        {"id": "ep-08-05", "address": "127.0.0.1:12054", "weight": 2, "zone": "az-b", "metadata": {"rack": "r6", "service": "svc-08"}},
+        {"id": "ep-08-06", "address": "127.0.0.1:12055", "weight": 3, "zone": "az-c", "metadata": {"rack": "r7", "service": "svc-08"}},
+        {"id": "ep-08-07", "address": "127.0.0.1:12056", "weight": 1, "zone": "az-a", "metadata": {"rack": "r8", "service": "svc-08"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1750, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 28, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-4", "tier": "special"}
+    },
+    {
+      "id": "pool-09",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {"id": "ep-09-01", "address": "127.0.0.1:12057", "weight": 1, "zone": "az-a", "metadata": {"rack": "r1", "service": "svc-09"}},
+        {"id": "ep-09-02", "address": "127.0.0.1:12058", "weight": 2, "zone": "az-b", "metadata": {"rack": "r2", "service": "svc-09"}},
+        {"id": "ep-09-03", "address": "127.0.0.1:12059", "weight": 3, "zone": "az-c", "metadata": {"rack": "r3", "service": "svc-09"}},
+        {"id": "ep-09-04", "address": "127.0.0.1:12060", "weight": 1, "zone": "az-a", "metadata": {"rack": "r4", "service": "svc-09"}},
+        {"id": "ep-09-05", "address": "127.0.0.1:12061", "weight": 2, "zone": "az-b", "metadata": {"rack": "r5", "service": "svc-09"}},
+        {"id": "ep-09-06", "address": "127.0.0.1:12062", "weight": 3, "zone": "az-c", "metadata": {"rack": "r6", "service": "svc-09"}},
+        {"id": "ep-09-07", "address": "127.0.0.1:12063", "weight": 1, "zone": "az-a", "metadata": {"rack": "r7", "service": "svc-09"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1000, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 16, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-1", "tier": "frontend"}
+    },
+    {
+      "id": "pool-10",
+      "strategy": "round_robin",
+      "endpoints": [
+        {"id": "ep-10-01", "address": "127.0.0.1:12064", "weight": 1, "zone": "az-a", "metadata": {"rack": "r8", "service": "svc-10"}},
+        {"id": "ep-10-02", "address": "127.0.0.1:12065", "weight": 2, "zone": "az-b", "metadata": {"rack": "r1", "service": "svc-10"}},
+        {"id": "ep-10-03", "address": "127.0.0.1:12066", "weight": 3, "zone": "az-c", "metadata": {"rack": "r2", "service": "svc-10"}},
+        {"id": "ep-10-04", "address": "127.0.0.1:12067", "weight": 1, "zone": "az-a", "metadata": {"rack": "r3", "service": "svc-10"}},
+        {"id": "ep-10-05", "address": "127.0.0.1:12068", "weight": 2, "zone": "az-b", "metadata": {"rack": "r4", "service": "svc-10"}},
+        {"id": "ep-10-06", "address": "127.0.0.1:12069", "weight": 3, "zone": "az-c", "metadata": {"rack": "r5", "service": "svc-10"}},
+        {"id": "ep-10-07", "address": "127.0.0.1:12070", "weight": 1, "zone": "az-a", "metadata": {"rack": "r6", "service": "svc-10"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1250, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 20, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-2", "tier": "api"}
+    },
+    {
+      "id": "pool-11",
+      "strategy": "weighted",
+      "endpoints": [
+        {"id": "ep-11-01", "address": "127.0.0.1:12071", "weight": 1, "zone": "az-a", "metadata": {"rack": "r7", "service": "svc-11"}},
+        {"id": "ep-11-02", "address": "127.0.0.1:12072", "weight": 2, "zone": "az-b", "metadata": {"rack": "r8", "service": "svc-11"}},
+        {"id": "ep-11-03", "address": "127.0.0.1:12073", "weight": 3, "zone": "az-c", "metadata": {"rack": "r1", "service": "svc-11"}},
+        {"id": "ep-11-04", "address": "127.0.0.1:12074", "weight": 1, "zone": "az-a", "metadata": {"rack": "r2", "service": "svc-11"}},
+        {"id": "ep-11-05", "address": "127.0.0.1:12075", "weight": 2, "zone": "az-b", "metadata": {"rack": "r3", "service": "svc-11"}},
+        {"id": "ep-11-06", "address": "127.0.0.1:12076", "weight": 3, "zone": "az-c", "metadata": {"rack": "r4", "service": "svc-11"}},
+        {"id": "ep-11-07", "address": "127.0.0.1:12077", "weight": 1, "zone": "az-a", "metadata": {"rack": "r5", "service": "svc-11"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1500, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 24, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-3", "tier": "worker"}
+    },
+    {
+      "id": "pool-12",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {"id": "ep-12-01", "address": "127.0.0.1:12078", "weight": 1, "zone": "az-a", "metadata": {"rack": "r6", "service": "svc-12"}},
+        {"id": "ep-12-02", "address": "127.0.0.1:12079", "weight": 2, "zone": "az-b", "metadata": {"rack": "r7", "service": "svc-12"}},
+        {"id": "ep-12-03", "address": "127.0.0.1:12080", "weight": 3, "zone": "az-c", "metadata": {"rack": "r8", "service": "svc-12"}},
+        {"id": "ep-12-04", "address": "127.0.0.1:12081", "weight": 1, "zone": "az-a", "metadata": {"rack": "r1", "service": "svc-12"}},
+        {"id": "ep-12-05", "address": "127.0.0.1:12082", "weight": 2, "zone": "az-b", "metadata": {"rack": "r2", "service": "svc-12"}},
+        {"id": "ep-12-06", "address": "127.0.0.1:12083", "weight": 3, "zone": "az-c", "metadata": {"rack": "r3", "service": "svc-12"}},
+        {"id": "ep-12-07", "address": "127.0.0.1:12084", "weight": 1, "zone": "az-a", "metadata": {"rack": "r4", "service": "svc-12"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1750, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 28, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-4", "tier": "special"}
+    },
+    {
+      "id": "pool-13",
+      "strategy": "round_robin",
+      "endpoints": [
+        {"id": "ep-13-01", "address": "127.0.0.1:12085", "weight": 1, "zone": "az-a", "metadata": {"rack": "r5", "service": "svc-13"}},
+        {"id": "ep-13-02", "address": "127.0.0.1:12086", "weight": 2, "zone": "az-b", "metadata": {"rack": "r6", "service": "svc-13"}},
+        {"id": "ep-13-03", "address": "127.0.0.1:12087", "weight": 3, "zone": "az-c", "metadata": {"rack": "r7", "service": "svc-13"}},
+        {"id": "ep-13-04", "address": "127.0.0.1:12088", "weight": 1, "zone": "az-a", "metadata": {"rack": "r8", "service": "svc-13"}},
+        {"id": "ep-13-05", "address": "127.0.0.1:12089", "weight": 2, "zone": "az-b", "metadata": {"rack": "r1", "service": "svc-13"}},
+        {"id": "ep-13-06", "address": "127.0.0.1:12090", "weight": 3, "zone": "az-c", "metadata": {"rack": "r2", "service": "svc-13"}},
+        {"id": "ep-13-07", "address": "127.0.0.1:12091", "weight": 1, "zone": "az-a", "metadata": {"rack": "r3", "service": "svc-13"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1000, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 16, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-1", "tier": "frontend"}
+    },
+    {
+      "id": "pool-14",
+      "strategy": "weighted",
+      "endpoints": [
+        {"id": "ep-14-01", "address": "127.0.0.1:12092", "weight": 1, "zone": "az-a", "metadata": {"rack": "r4", "service": "svc-14"}},
+        {"id": "ep-14-02", "address": "127.0.0.1:12093", "weight": 2, "zone": "az-b", "metadata": {"rack": "r5", "service": "svc-14"}},
+        {"id": "ep-14-03", "address": "127.0.0.1:12094", "weight": 3, "zone": "az-c", "metadata": {"rack": "r6", "service": "svc-14"}},
+        {"id": "ep-14-04", "address": "127.0.0.1:12095", "weight": 1, "zone": "az-a", "metadata": {"rack": "r7", "service": "svc-14"}},
+        {"id": "ep-14-05", "address": "127.0.0.1:12096", "weight": 2, "zone": "az-b", "metadata": {"rack": "r8", "service": "svc-14"}},
+        {"id": "ep-14-06", "address": "127.0.0.1:12097", "weight": 3, "zone": "az-c", "metadata": {"rack": "r1", "service": "svc-14"}},
+        {"id": "ep-14-07", "address": "127.0.0.1:12098", "weight": 1, "zone": "az-a", "metadata": {"rack": "r2", "service": "svc-14"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1250, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 20, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-2", "tier": "api"}
+    },
+    {
+      "id": "pool-15",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {"id": "ep-15-01", "address": "127.0.0.1:12099", "weight": 1, "zone": "az-a", "metadata": {"rack": "r3", "service": "svc-15"}},
+        {"id": "ep-15-02", "address": "127.0.0.1:12100", "weight": 2, "zone": "az-b", "metadata": {"rack": "r4", "service": "svc-15"}},
+        {"id": "ep-15-03", "address": "127.0.0.1:12101", "weight": 3, "zone": "az-c", "metadata": {"rack": "r5", "service": "svc-15"}},
+        {"id": "ep-15-04", "address": "127.0.0.1:12102", "weight": 1, "zone": "az-a", "metadata": {"rack": "r6", "service": "svc-15"}},
+        {"id": "ep-15-05", "address": "127.0.0.1:12103", "weight": 2, "zone": "az-b", "metadata": {"rack": "r7", "service": "svc-15"}},
+        {"id": "ep-15-06", "address": "127.0.0.1:12104", "weight": 3, "zone": "az-c", "metadata": {"rack": "r8", "service": "svc-15"}},
+        {"id": "ep-15-07", "address": "127.0.0.1:12105", "weight": 1, "zone": "az-a", "metadata": {"rack": "r1", "service": "svc-15"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1500, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 24, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-3", "tier": "worker"}
+    },
+    {
+      "id": "pool-16",
+      "strategy": "round_robin",
+      "endpoints": [
+        {"id": "ep-16-01", "address": "127.0.0.1:12106", "weight": 1, "zone": "az-a", "metadata": {"rack": "r2", "service": "svc-16"}},
+        {"id": "ep-16-02", "address": "127.0.0.1:12107", "weight": 2, "zone": "az-b", "metadata": {"rack": "r3", "service": "svc-16"}},
+        {"id": "ep-16-03", "address": "127.0.0.1:12108", "weight": 3, "zone": "az-c", "metadata": {"rack": "r4", "service": "svc-16"}},
+        {"id": "ep-16-04", "address": "127.0.0.1:12109", "weight": 1, "zone": "az-a", "metadata": {"rack": "r5", "service": "svc-16"}},
+        {"id": "ep-16-05", "address": "127.0.0.1:12110", "weight": 2, "zone": "az-b", "metadata": {"rack": "r6", "service": "svc-16"}},
+        {"id": "ep-16-06", "address": "127.0.0.1:12111", "weight": 3, "zone": "az-c", "metadata": {"rack": "r7", "service": "svc-16"}},
+        {"id": "ep-16-07", "address": "127.0.0.1:12112", "weight": 1, "zone": "az-a", "metadata": {"rack": "r8", "service": "svc-16"}}
+      ],
+      "health": {"path": "/health", "interval_ms": 1750, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 128, "max_idle_conns_per_host": 28, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"team": "edge-4", "tier": "special"}
+    }
+  ]
+}

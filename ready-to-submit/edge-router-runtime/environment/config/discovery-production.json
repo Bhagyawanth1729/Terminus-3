@@ -1,0 +1,772 @@
+{
+  "schema_version": 1,
+  "generation": 91,
+  "sources": [
+    {
+      "name": "regional-discovery",
+      "revision": 91,
+      "digest": ""
+    }
+  ],
+  "defaults": {
+    "connect_timeout_ms": 1200,
+    "request_timeout_ms": 7000,
+    "drain_timeout_ms": 18000,
+    "health_interval_ms": 1250,
+    "health_timeout_ms": 300,
+    "affinity_ttl_seconds": 240,
+    "affinity_capacity": 3072
+  },
+  "routes": [
+    {
+      "id": "discovery-route-001",
+      "hosts": ["regional-1.example.internal"],
+      "path_prefix": "/regional/v1/orders",
+      "methods": ["GET", "HEAD"],
+      "pool": "regional-pool-01",
+      "failover_pools": ["regional-pool-05"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1200,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {
+        "mode": "header",
+        "header": "X-Regional-Session",
+        "ttl_seconds": 240,
+        "capacity": 3072
+      },
+      "headers": [],
+      "priority": 120
+    },
+    {
+      "id": "discovery-route-002",
+      "hosts": ["regional-2.example.internal"],
+      "path_prefix": "/regional/v1/catalog",
+      "methods": ["GET"],
+      "pool": "regional-pool-02",
+      "failover_pools": ["regional-pool-06"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1400,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 119
+    },
+    {
+      "id": "discovery-route-003",
+      "hosts": ["regional-3.example.internal"],
+      "path_prefix": "/regional/v2/payments",
+      "methods": ["POST"],
+      "pool": "regional-pool-03",
+      "failover_pools": ["regional-pool-07"],
+      "retry": {
+        "attempts": 4,
+        "per_try_timeout_ms": 1100,
+        "retry_on": ["connect-error", "5xx", "reset", "429"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Release-Track", "exact": "stable"}],
+      "priority": 118
+    },
+    {
+      "id": "discovery-route-004",
+      "hosts": ["regional-4.example.internal"],
+      "path_prefix": "/regional/v2/inventory",
+      "methods": ["GET", "POST"],
+      "pool": "regional-pool-04",
+      "failover_pools": ["regional-pool-08"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1300,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 117
+    },
+    {
+      "id": "discovery-route-005",
+      "hosts": ["regional-5.example.internal"],
+      "path_prefix": "/regional/v3/search",
+      "methods": ["GET"],
+      "pool": "regional-pool-05",
+      "failover_pools": ["regional-pool-01"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1200,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {
+        "mode": "header",
+        "header": "X-Regional-Session",
+        "ttl_seconds": 240,
+        "capacity": 3072
+      },
+      "headers": [],
+      "priority": 116
+    },
+    {
+      "id": "discovery-route-006",
+      "hosts": ["regional-6.example.internal"],
+      "path_prefix": "/regional/v3/profile",
+      "methods": ["PUT", "PATCH"],
+      "pool": "regional-pool-06",
+      "failover_pools": ["regional-pool-02"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1400,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 115
+    },
+    {
+      "id": "discovery-route-007",
+      "hosts": ["regional-7.example.internal"],
+      "path_prefix": "/regional/v4/events",
+      "methods": ["POST"],
+      "pool": "regional-pool-07",
+      "failover_pools": ["regional-pool-03"],
+      "retry": {
+        "attempts": 4,
+        "per_try_timeout_ms": 1000,
+        "retry_on": ["connect-error", "5xx", "reset", "429"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Release-Track", "prefix": "regional-"}],
+      "priority": 114
+    },
+    {
+      "id": "discovery-route-008",
+      "hosts": ["regional-8.example.internal"],
+      "path_prefix": "/regional/v4/audit",
+      "methods": ["GET"],
+      "pool": "regional-pool-08",
+      "failover_pools": ["regional-pool-04"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1500,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 113
+    },
+    {
+      "id": "discovery-route-009",
+      "hosts": ["*"],
+      "path_prefix": "/regional/public/status",
+      "methods": ["GET", "HEAD"],
+      "pool": "regional-pool-01",
+      "failover_pools": ["regional-pool-02"],
+      "retry": {
+        "attempts": 2,
+        "per_try_timeout_ms": 900,
+        "retry_on": ["connect-error", "5xx"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 100
+    },
+    {
+      "id": "discovery-route-010",
+      "hosts": ["regional-2.example.internal"],
+      "path_prefix": "/regional/admin/sync",
+      "methods": ["POST"],
+      "pool": "regional-pool-02",
+      "failover_pools": ["regional-pool-03"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1300,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Operator-Class", "exact": "automation"}],
+      "priority": 125
+    },
+    {
+      "id": "discovery-route-011",
+      "hosts": ["regional-3.example.internal"],
+      "path_prefix": "/regional/v2/refunds",
+      "methods": ["POST"],
+      "pool": "regional-pool-03",
+      "failover_pools": ["regional-pool-04"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1200,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {
+        "mode": "header",
+        "header": "X-Regional-Session",
+        "ttl_seconds": 180,
+        "capacity": 2048
+      },
+      "headers": [],
+      "priority": 121
+    },
+    {
+      "id": "discovery-route-012",
+      "hosts": ["regional-4.example.internal"],
+      "path_prefix": "/regional/v2/reservations",
+      "methods": ["GET", "POST", "DELETE"],
+      "pool": "regional-pool-04",
+      "failover_pools": ["regional-pool-05"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1250,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 120
+    },
+    {
+      "id": "discovery-route-013",
+      "hosts": ["regional-5.example.internal"],
+      "path_prefix": "/regional/v3/suggest",
+      "methods": ["GET"],
+      "pool": "regional-pool-05",
+      "failover_pools": ["regional-pool-06"],
+      "retry": {
+        "attempts": 2,
+        "per_try_timeout_ms": 1000,
+        "retry_on": ["connect-error", "5xx"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 112
+    },
+    {
+      "id": "discovery-route-014",
+      "hosts": ["regional-6.example.internal"],
+      "path_prefix": "/regional/v3/preferences",
+      "methods": ["GET", "PUT"],
+      "pool": "regional-pool-06",
+      "failover_pools": ["regional-pool-07"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1350,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {
+        "mode": "header",
+        "header": "X-Regional-Session",
+        "ttl_seconds": 240,
+        "capacity": 3072
+      },
+      "headers": [],
+      "priority": 111
+    },
+    {
+      "id": "discovery-route-015",
+      "hosts": ["regional-7.example.internal"],
+      "path_prefix": "/regional/v4/ingest",
+      "methods": ["POST"],
+      "pool": "regional-pool-07",
+      "failover_pools": ["regional-pool-08"],
+      "retry": {
+        "attempts": 4,
+        "per_try_timeout_ms": 950,
+        "retry_on": ["connect-error", "5xx", "reset", "429"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [],
+      "priority": 124
+    },
+    {
+      "id": "discovery-route-016",
+      "hosts": ["regional-8.example.internal"],
+      "path_prefix": "/regional/v4/history",
+      "methods": ["GET"],
+      "pool": "regional-pool-08",
+      "failover_pools": ["regional-pool-01"],
+      "retry": {
+        "attempts": 3,
+        "per_try_timeout_ms": 1450,
+        "retry_on": ["connect-error", "5xx", "reset"]
+      },
+      "affinity": {"mode": "none"},
+      "headers": [{"name": "X-Data-Class", "prefix": "history-"}],
+      "priority": 110
+    }
+  ],
+  "pools": [
+    {
+      "id": "regional-pool-01",
+      "strategy": "round_robin",
+      "endpoints": [
+        {
+          "id": "regional-01-01",
+          "address": "127.0.0.1:13001",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "orders"}
+        },
+        {
+          "id": "regional-01-02",
+          "address": "127.0.0.1:13002",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "orders"}
+        },
+        {
+          "id": "regional-01-03",
+          "address": "127.0.0.1:13003",
+          "weight": 1,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "orders"}
+        },
+        {
+          "id": "regional-01-04",
+          "address": "127.0.0.1:13004",
+          "weight": 3,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "orders"}
+        },
+        {
+          "id": "regional-01-05",
+          "address": "127.0.0.1:13005",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "orders"}
+        },
+        {
+          "id": "regional-01-06",
+          "address": "127.0.0.1:13006",
+          "weight": 1,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "orders"}
+        },
+        {
+          "id": "regional-01-07",
+          "address": "127.0.0.1:13007",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "orders"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1000, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 160, "max_idle_conns_per_host": 20, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "orders"}
+    },
+    {
+      "id": "regional-pool-02",
+      "strategy": "weighted",
+      "endpoints": [
+        {
+          "id": "regional-02-01",
+          "address": "127.0.0.1:13008",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "catalog"}
+        },
+        {
+          "id": "regional-02-02",
+          "address": "127.0.0.1:13009",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "catalog"}
+        },
+        {
+          "id": "regional-02-03",
+          "address": "127.0.0.1:13010",
+          "weight": 3,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "catalog"}
+        },
+        {
+          "id": "regional-02-04",
+          "address": "127.0.0.1:13011",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "catalog"}
+        },
+        {
+          "id": "regional-02-05",
+          "address": "127.0.0.1:13012",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "catalog"}
+        },
+        {
+          "id": "regional-02-06",
+          "address": "127.0.0.1:13013",
+          "weight": 3,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "catalog"}
+        },
+        {
+          "id": "regional-02-07",
+          "address": "127.0.0.1:13014",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "catalog"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1250, "timeout_ms": 275, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 160, "max_idle_conns_per_host": 24, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "catalog"}
+    },
+    {
+      "id": "regional-pool-03",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {
+          "id": "regional-03-01",
+          "address": "127.0.0.1:13015",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "payments"}
+        },
+        {
+          "id": "regional-03-02",
+          "address": "127.0.0.1:13016",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "payments"}
+        },
+        {
+          "id": "regional-03-03",
+          "address": "127.0.0.1:13017",
+          "weight": 3,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "payments"}
+        },
+        {
+          "id": "regional-03-04",
+          "address": "127.0.0.1:13018",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "payments"}
+        },
+        {
+          "id": "regional-03-05",
+          "address": "127.0.0.1:13019",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "payments"}
+        },
+        {
+          "id": "regional-03-06",
+          "address": "127.0.0.1:13020",
+          "weight": 3,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "payments"}
+        },
+        {
+          "id": "regional-03-07",
+          "address": "127.0.0.1:13021",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "payments"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1500, "timeout_ms": 300, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 192, "max_idle_conns_per_host": 28, "idle_conn_timeout_ms": 50000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "payments"}
+    },
+    {
+      "id": "regional-pool-04",
+      "strategy": "round_robin",
+      "endpoints": [
+        {
+          "id": "regional-04-01",
+          "address": "127.0.0.1:13022",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "inventory"}
+        },
+        {
+          "id": "regional-04-02",
+          "address": "127.0.0.1:13023",
+          "weight": 1,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "inventory"}
+        },
+        {
+          "id": "regional-04-03",
+          "address": "127.0.0.1:13024",
+          "weight": 2,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "inventory"}
+        },
+        {
+          "id": "regional-04-04",
+          "address": "127.0.0.1:13025",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "inventory"}
+        },
+        {
+          "id": "regional-04-05",
+          "address": "127.0.0.1:13026",
+          "weight": 3,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "inventory"}
+        },
+        {
+          "id": "regional-04-06",
+          "address": "127.0.0.1:13027",
+          "weight": 2,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "inventory"}
+        },
+        {
+          "id": "regional-04-07",
+          "address": "127.0.0.1:13028",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "inventory"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1100, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 176, "max_idle_conns_per_host": 22, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "inventory"}
+    },
+    {
+      "id": "regional-pool-05",
+      "strategy": "weighted",
+      "endpoints": [
+        {
+          "id": "regional-05-01",
+          "address": "127.0.0.1:13029",
+          "weight": 3,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "search"}
+        },
+        {
+          "id": "regional-05-02",
+          "address": "127.0.0.1:13030",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "search"}
+        },
+        {
+          "id": "regional-05-03",
+          "address": "127.0.0.1:13031",
+          "weight": 1,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "search"}
+        },
+        {
+          "id": "regional-05-04",
+          "address": "127.0.0.1:13032",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "search"}
+        },
+        {
+          "id": "regional-05-05",
+          "address": "127.0.0.1:13033",
+          "weight": 3,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "search"}
+        },
+        {
+          "id": "regional-05-06",
+          "address": "127.0.0.1:13034",
+          "weight": 1,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "search"}
+        },
+        {
+          "id": "regional-05-07",
+          "address": "127.0.0.1:13035",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "search"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1300, "timeout_ms": 275, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 208, "max_idle_conns_per_host": 30, "idle_conn_timeout_ms": 50000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "header", "header": "X-Regional-Session", "ttl_seconds": 240, "capacity": 3072},
+      "metadata": {"region": "regional", "tier": "search"}
+    },
+    {
+      "id": "regional-pool-06",
+      "strategy": "least_inflight",
+      "endpoints": [
+        {
+          "id": "regional-06-01",
+          "address": "127.0.0.1:13036",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "profile"}
+        },
+        {
+          "id": "regional-06-02",
+          "address": "127.0.0.1:13037",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "profile"}
+        },
+        {
+          "id": "regional-06-03",
+          "address": "127.0.0.1:13038",
+          "weight": 1,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "profile"}
+        },
+        {
+          "id": "regional-06-04",
+          "address": "127.0.0.1:13039",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "profile"}
+        },
+        {
+          "id": "regional-06-05",
+          "address": "127.0.0.1:13040",
+          "weight": 3,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "profile"}
+        },
+        {
+          "id": "regional-06-06",
+          "address": "127.0.0.1:13041",
+          "weight": 1,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "profile"}
+        },
+        {
+          "id": "regional-06-07",
+          "address": "127.0.0.1:13042",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "profile"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1400, "timeout_ms": 300, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 176, "max_idle_conns_per_host": 22, "idle_conn_timeout_ms": 45000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "profile"}
+    },
+    {
+      "id": "regional-pool-07",
+      "strategy": "round_robin",
+      "endpoints": [
+        {
+          "id": "regional-07-01",
+          "address": "127.0.0.1:13043",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "events"}
+        },
+        {
+          "id": "regional-07-02",
+          "address": "127.0.0.1:13044",
+          "weight": 1,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "events"}
+        },
+        {
+          "id": "regional-07-03",
+          "address": "127.0.0.1:13045",
+          "weight": 2,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "events"}
+        },
+        {
+          "id": "regional-07-04",
+          "address": "127.0.0.1:13046",
+          "weight": 3,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "events"}
+        },
+        {
+          "id": "regional-07-05",
+          "address": "127.0.0.1:13047",
+          "weight": 1,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "events"}
+        },
+        {
+          "id": "regional-07-06",
+          "address": "127.0.0.1:13048",
+          "weight": 2,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "events"}
+        },
+        {
+          "id": "regional-07-07",
+          "address": "127.0.0.1:13049",
+          "weight": 3,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "events"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1000, "timeout_ms": 225, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 224, "max_idle_conns_per_host": 32, "idle_conn_timeout_ms": 55000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "events"}
+    },
+    {
+      "id": "regional-pool-08",
+      "strategy": "weighted",
+      "endpoints": [
+        {
+          "id": "regional-08-01",
+          "address": "127.0.0.1:13050",
+          "weight": 1,
+          "zone": "region-a",
+          "metadata": {"rack": "a1", "service": "audit"}
+        },
+        {
+          "id": "regional-08-02",
+          "address": "127.0.0.1:13051",
+          "weight": 2,
+          "zone": "region-b",
+          "metadata": {"rack": "b1", "service": "audit"}
+        },
+        {
+          "id": "regional-08-03",
+          "address": "127.0.0.1:13052",
+          "weight": 3,
+          "zone": "region-c",
+          "metadata": {"rack": "c1", "service": "audit"}
+        },
+        {
+          "id": "regional-08-04",
+          "address": "127.0.0.1:13053",
+          "weight": 2,
+          "zone": "region-a",
+          "metadata": {"rack": "a2", "service": "audit"}
+        },
+        {
+          "id": "regional-08-05",
+          "address": "127.0.0.1:13054",
+          "weight": 1,
+          "zone": "region-b",
+          "metadata": {"rack": "b2", "service": "audit"}
+        },
+        {
+          "id": "regional-08-06",
+          "address": "127.0.0.1:13055",
+          "weight": 2,
+          "zone": "region-c",
+          "metadata": {"rack": "c2", "service": "audit"}
+        },
+        {
+          "id": "regional-08-07",
+          "address": "127.0.0.1:13056",
+          "weight": 3,
+          "zone": "region-a",
+          "metadata": {"rack": "a3", "service": "audit"}
+        }
+      ],
+      "health": {"path": "/health", "interval_ms": 1200, "timeout_ms": 250, "healthy_threshold": 2, "unhealthy_threshold": 3, "expected_statuses": [200, 204]},
+      "transport": {"scheme": "http", "max_idle_conns": 192, "max_idle_conns_per_host": 26, "idle_conn_timeout_ms": 50000, "tls_insecure_skip_verify": false},
+      "affinity": {"mode": "none"},
+      "metadata": {"region": "regional", "tier": "audit"}
+    }
+  ]
+}
