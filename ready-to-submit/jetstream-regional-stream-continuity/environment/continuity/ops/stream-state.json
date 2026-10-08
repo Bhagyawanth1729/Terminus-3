@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-08T17:18:10Z",
+  "incident_id": "INC-JS-2026-0808-17",
+  "domains": {
+    "east": {
+      "domain": "edge-east",
+      "stream": "EDGE_TELEMETRY",
+      "first_seq": 1,
+      "last_seq": 6000,
+      "messages": 6000,
+      "duplicate_window_seconds": 120,
+      "max_age_seconds": 172800,
+      "subjects": ["telemetry.east.>"]
+    },
+    "west": {
+      "domain": "edge-west",
+      "stream": "EDGE_TELEMETRY",
+      "first_seq": 1,
+      "last_seq": 6000,
+      "messages": 6000,
+      "duplicate_window_seconds": 120,
+      "max_age_seconds": 172800,
+      "subjects": ["telemetry.west.>"]
+    },
+    "hub": {
+      "domain": "hub",
+      "stream": "REGIONAL_RAW_ARCHIVE",
+      "messages": 11395,
+      "first_seq": 1,
+      "last_seq": 11395,
+      "max_age_seconds": 172800,
+      "allow_direct": true,
+      "subjects": ["telemetry.raw.>"],
+      "sources": [
+        {
+          "region": "east",
+          "name": "EDGE_TELEMETRY",
+          "domain": "edge-east",
+          "active": true,
+          "lag": 300
+        },
+        {
+          "region": "west",
+          "name": "EDGE_TELEMETRY",
+          "domain": "edge-east",
+          "active": true,
+          "lag": 303
+        }
+      ]
+    }
+  },
+  "consumers": {
+    "telemetry-indexer": {
+      "required": true,
+      "east": {"application_effect_seq": 5650, "application_ack_seq": 5650, "jetstream_ack_floor": 5662},
+      "west": {"application_effect_seq": 5580, "application_ack_seq": 5580, "jetstream_ack_floor": 5594}
+    },
+    "safety-state-projector": {
+      "required": true,
+      "east": {"application_effect_seq": 5610, "application_ack_seq": 5610, "jetstream_ack_floor": 5624},
+      "west": {"application_effect_seq": 5540, "application_ack_seq": 5540, "jetstream_ack_floor": 5568}
+    }
+  },
+  "cleanup_preview": {
+    "east": {"archive_sequence": 5698, "slowest_required_consumer": 5610, "active_replay_pin": null, "reported_safe_sequence": 5698},
+    "west": {"archive_sequence": 5697, "slowest_required_consumer": 5540, "active_replay_pin": 5311, "reported_safe_sequence": 5697}
+  }
+}

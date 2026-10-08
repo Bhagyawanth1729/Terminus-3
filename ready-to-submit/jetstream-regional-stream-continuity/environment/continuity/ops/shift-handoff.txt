@@ -1,0 +1,9 @@
+INC-JS-2026-0808-17 — night shift handoff
+
+West leaf connectivity dropped at 16:41 UTC and returned around 17:17. Both edge sites continued accepting telemetry locally while the carrier path was down. After reconnect the raw archive started moving again, but our journal/archive comparison still shows three west identities and two east identities without matching archive entries. The consumer progress views also disagree: JetStream ack floors are ahead of the application effect checkpoints on both required workers.
+
+We saw at least one index effect execute again on a redelivery. Replay was stopped before cleanup or stream changes because the current cleanup report would delete rows newer than one required consumer and it includes rows referenced by the approved west replay plan.
+
+Please treat the edge journals as authority until reconciliation is clean. Do not reset an origin checkpoint merely because a stream presents a lower sequence; a recreated origin needs an explicit generation decision first. The captured stream/source state is in stream-state.json and the controller log is under /app/continuity/log/archive.
+
+Expected operator output after repair: health.json and reconciliation.json under /app/continuity/out. Keep the existing event envelope and continuityctl interface.

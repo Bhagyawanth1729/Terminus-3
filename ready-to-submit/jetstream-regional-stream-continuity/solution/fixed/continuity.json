@@ -1,0 +1,127 @@
+{
+  "incident_id": "INC-JS-2026-0808-17",
+  "regions": {
+    "east": {
+      "domain": "edge-east",
+      "stream_name": "EDGE_EAST_TELEMETRY",
+      "server_url": "nats://127.0.0.1:4223",
+      "monitor_url": "http://127.0.0.1:8223",
+      "subject_prefix": "telemetry.east",
+      "stream_policy": {
+        "retention": "limits",
+        "storage": "file",
+        "replicas": 1,
+        "duplicate_window_seconds": 21600,
+        "max_age_seconds": 259200,
+        "allow_direct": false,
+        "deny_delete": true,
+        "deny_purge": true
+      }
+    },
+    "west": {
+      "domain": "edge-west",
+      "stream_name": "EDGE_WEST_TELEMETRY",
+      "server_url": "nats://127.0.0.1:4224",
+      "monitor_url": "http://127.0.0.1:8224",
+      "subject_prefix": "telemetry.west",
+      "stream_policy": {
+        "retention": "limits",
+        "storage": "file",
+        "replicas": 1,
+        "duplicate_window_seconds": 21600,
+        "max_age_seconds": 259200,
+        "allow_direct": false,
+        "deny_delete": true,
+        "deny_purge": true
+      }
+    }
+  },
+  "hub": {
+    "domain": "hub",
+    "stream_name": "REGIONAL_RAW_ARCHIVE",
+    "server_url": "nats://127.0.0.1:4222",
+    "monitor_url": "http://127.0.0.1:8222"
+  },
+  "hub_stream_policy": {
+    "retention": "limits",
+    "storage": "file",
+    "replicas": 1,
+    "duplicate_window_seconds": 21600,
+    "max_age_seconds": 259200,
+    "allow_direct": false,
+    "deny_delete": true,
+    "deny_purge": true
+  },
+  "topology": {
+    "edge_streams": {
+      "east": {
+        "name": "EDGE_EAST_TELEMETRY",
+        "domain": "edge-east",
+        "subjects": ["telemetry.east.>"]
+      },
+      "west": {
+        "name": "EDGE_WEST_TELEMETRY",
+        "domain": "edge-west",
+        "subjects": ["telemetry.west.>"]
+      }
+    },
+    "hub_archive": {
+      "name": "REGIONAL_RAW_ARCHIVE",
+      "domain": "hub",
+      "subjects": []
+    },
+    "sources": [
+      {
+        "region": "east",
+        "origin": {
+          "name": "EDGE_EAST_TELEMETRY",
+          "domain": "edge-east",
+          "subjects": ["telemetry.east.>"]
+        },
+        "destination_prefix": "telemetry.raw.east"
+      },
+      {
+        "region": "west",
+        "origin": {
+          "name": "EDGE_WEST_TELEMETRY",
+          "domain": "edge-west",
+          "subjects": ["telemetry.west.>"]
+        },
+        "destination_prefix": "telemetry.raw.west"
+      }
+    ],
+    "raw_archive_subjects": ["telemetry.raw.east.>", "telemetry.raw.west.>"],
+    "derived_subject_prefix": "telemetry.derived"
+  },
+  "consumers": {
+    "telemetry-indexer": {
+      "required": true,
+      "filter_subject": "telemetry.raw.>",
+      "max_ack_pending": 512,
+      "ack_wait_seconds": 45,
+      "effect_type": "SEARCH_INDEX"
+    },
+    "safety-state-projector": {
+      "required": true,
+      "filter_subject": "telemetry.raw.>",
+      "max_ack_pending": 256,
+      "ack_wait_seconds": 60,
+      "effect_type": "SAFETY_STATE"
+    },
+    "analytics-sampler": {
+      "required": false,
+      "filter_subject": "telemetry.raw.>",
+      "max_ack_pending": 1024,
+      "ack_wait_seconds": 30,
+      "effect_type": "ANALYTICS_SAMPLE"
+    }
+  },
+  "recovery": {
+    "lease_ttl_seconds": 30,
+    "replay_batch_size": 200,
+    "publish_timeout_seconds": 3,
+    "maximum_disconnect_seconds": 172800,
+    "maximum_replay_seconds": 43200,
+    "safety_margin_seconds": 21600
+  }
+}

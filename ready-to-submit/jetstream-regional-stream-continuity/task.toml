@@ -1,0 +1,32 @@
+version = "2.0"
+name = "jetstream-regional-stream-continuity"
+category = "Software"
+subcategory = "Systems"
+tags = ["nats", "jetstream", "distributed-systems", "streaming", "reconciliation", "idempotency"]
+languages = ["python", "bash", "sql"]
+difficulty = "advanced"
+expert_time_estimate_hours = 14
+artifacts = ["/app/continuity"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+difficulty_explanation = "The visible symptoms span three JetStream domains and an application-side durability layer. A fix can stop duplicates while still skipping a recreated origin, make the archive catch up while leaving checkpoint effects non-idempotent, or preserve consumer progress while retention removes the only replay authority. The hard part is restoring one continuity model across stream identity, event identity, checkpoints, replay and retention rather than repairing one queue symptom at a time."
+solution_explanation = "Use stable event identity and explicit origin-generation metadata as the cross-domain authority, make the hub archive source-only, persist effects and checkpoints idempotently, reconcile by origin/event identity instead of aggregate stream sequence, and gate replay/retention on durable convergence watermarks. Reject ambiguous generation resets instead of silently treating a new low sequence as old history."
+verification_explanation = "The verifier seeds fresh, disconnected, partially replayed, duplicated, generation-reset and crash-interrupted states. It exercises the submitted control plane against isolated state and real local JetStream processes, then checks archive membership, durable checkpoints, side-effect uniqueness, replay plans, retention decisions, fencing and restart convergence."
+relevant_experience = "Distributed streaming systems, NATS JetStream, durable consumer processing, event idempotency, replay/reconciliation, SQLite transaction semantics and production incident recovery."
+
+[verifier]
+timeout_sec = 2400
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 10800
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 1800
+cpus = 2
+memory_mb = 6144
+storage_mb = 12288
+workdir = "/app/continuity"

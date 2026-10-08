@@ -1,0 +1,18 @@
+2026-08-08T16:41:03.122Z level=WARN component=leaf-watch region=west peer=hub event=disconnect reason="carrier path reset" last_confirmed_origin_seq=5238
+2026-08-08T16:41:03.310Z level=INFO component=journal region=west state=local-only accepted_rate=18.7/s pending_publish=4
+2026-08-08T16:48:44.005Z level=INFO component=journal region=west state=local-only accepted=221 pending_publish=225 last_origin_seq=5463
+2026-08-08T17:02:18.941Z level=WARN component=archive-watch region=west hub_archive=REGIONAL_RAW_ARCHIVE source_lag=368 source_active=false
+2026-08-08T17:17:51.563Z level=INFO component=leaf-watch region=west peer=hub event=reconnect elapsed_seconds=2208
+2026-08-08T17:17:52.004Z level=INFO component=publisher region=west replay_candidate_count=363 retry_window_seconds=120
+2026-08-08T17:17:52.132Z level=INFO component=publisher region=west event_id=evt-west-g01-005311 origin_seq=5311 attempt=2 message_id=evt-west-g01-005311:attempt:2 result=ack stream=EDGE_TELEMETRY seq=5311 duplicate=false
+2026-08-08T17:17:52.187Z level=INFO component=publisher region=west event_id=evt-west-g01-005489 origin_seq=5489 attempt=2 message_id=evt-west-g01-005489:attempt:2 result=ack stream=EDGE_TELEMETRY seq=5489 duplicate=false
+2026-08-08T17:17:52.241Z level=INFO component=publisher region=west event_id=evt-west-g01-005603 origin_seq=5603 attempt=2 message_id=evt-west-g01-005603:attempt:2 result=ack stream=EDGE_TELEMETRY seq=5603 duplicate=false
+2026-08-08T17:18:03.901Z level=WARN component=reconciler region=west journal_count=5700 archive_count=5697 aggregate_gap=3 duplicate_observations=6 status=DIVERGED
+2026-08-08T17:18:04.113Z level=WARN component=reconciler region=east journal_count=5700 archive_count=5698 aggregate_gap=2 duplicate_observations=6 status=DIVERGED
+2026-08-08T17:18:06.731Z level=ERROR component=effect-ledger consumer=telemetry-indexer event_id=evt-west-g01-005127 delivery_count=2 observation="same event applied after reconnect" effect_key=idx:evt-west-g01-005127
+2026-08-08T17:18:07.004Z level=WARN component=checkpoint consumer=safety-state-projector region=west application_seq=5540 js_ack_floor=5568 observation="consumer progress sources disagree"
+2026-08-08T17:18:07.110Z level=WARN component=checkpoint consumer=telemetry-indexer region=west application_seq=5580 js_ack_floor=5594 observation="consumer progress sources disagree"
+2026-08-08T17:19:20.772Z level=INFO component=replay-planner region=west plan=rp-west-incident-001 range=5311-5603 status=APPROVED items=3
+2026-08-08T17:19:21.019Z level=WARN component=retention region=west archive_seq=5697 slowest_required_consumer=5540 active_replay_start=5311 cleanup_safe_seq=5697 candidate_rows=147
+2026-08-08T17:19:22.385Z level=ERROR component=operator-guard action=replay state=HALTED reason="archive membership, consumer checkpoints and retention watermark disagree"
+2026-08-08T17:19:22.411Z level=INFO component=operator-guard action=handoff path=/app/continuity/ops/shift-handoff.txt
