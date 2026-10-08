@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claims-upload-data
+  namespace: claims-upload
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-retain
+  resources:
+    requests:
+      storage: 200Gi

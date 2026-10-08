@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claims-upload-proxy
+  namespace: claims-upload
+  labels:
+    app.kubernetes.io/name: claims-upload
+    app.kubernetes.io/component: proxy
+    app.kubernetes.io/part-of: claims-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: claims-upload
+      app.kubernetes.io/component: proxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: claims-upload
+        app.kubernetes.io/component: proxy
+        app.kubernetes.io/part-of: claims-platform
+    spec:
+      serviceAccountName: claims-upload
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: proxy
+          image: registry.example.local/nginx-claims-proxy:1.25.4
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: UPSTREAM
+              value: claims-upload-api:8080
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claims-upload-proxy
+  namespace: claims-upload
+  labels:
+    app.kubernetes.io/name: claims-upload
+    app.kubernetes.io/component: proxy
+spec:
+  selector:
+    app.kubernetes.io/name: claims-upload
+    app.kubernetes.io/component: proxy
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

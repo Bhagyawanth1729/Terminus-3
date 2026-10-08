@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: claims-upload
+  labels:
+    app.kubernetes.io/name: claims-upload
+    app.kubernetes.io/part-of: claims-platform

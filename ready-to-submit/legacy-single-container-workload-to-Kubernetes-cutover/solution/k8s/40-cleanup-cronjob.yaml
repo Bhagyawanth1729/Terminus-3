@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: claims-upload-cleanup
+  namespace: claims-upload
+  labels:
+    app.kubernetes.io/name: claims-upload
+    app.kubernetes.io/component: cleanup
+    app.kubernetes.io/part-of: claims-platform
+spec:
+  schedule: "17 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: claims-upload
+            app.kubernetes.io/component: cleanup
+        spec:
+          serviceAccountName: claims-upload
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: cleanup
+              image: registry.example.local/claims-upload:1.8.4
+              command: ["/app/bin/claims-upload", "cleanup"]
+              envFrom:
+                - configMapRef:
+                    name: claims-upload-config
+                - secretRef:
+                    name: claims-upload-secret
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: upload-data
+                  mountPath: /var/claims/uploads
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: upload-data
+              persistentVolumeClaim:
+                claimName: claims-upload-data
+            - name: tmp
+              emptyDir: {}
