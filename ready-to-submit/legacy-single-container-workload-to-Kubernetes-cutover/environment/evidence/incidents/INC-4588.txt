@@ -1,0 +1,10 @@
+INC-4588  severity=Sev1  status=recurring
+title: whole claims-upload container OOMKilled when worker spikes
+
+reporter: sre-oncall
+summary:
+  Kernel OOM killer terminates the single container. API, nginx, and
+  log forwarder die together with the worker. No partial degradation —
+  total outage until the unit is restarted.
+
+impact: full service outage 8–20 minutes per event.

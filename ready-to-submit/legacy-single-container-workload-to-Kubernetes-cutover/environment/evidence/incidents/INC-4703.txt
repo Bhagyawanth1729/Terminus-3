@@ -1,0 +1,11 @@
+INC-4703  severity=Sev1  status=open
+title: database password and signing key present as plain files in image
+
+reporter: security-eng
+summary:
+  Image layer contains /app/app/config/runtime.env with DB_PASSWORD and
+  SIGNING_KEY in cleartext. Same values are exported into the process
+  environment via the monolithic unit file. Secret rotation requires
+  rebuilding the image.
+
+impact: credential exposure; blocked for prod cutover until fixed.

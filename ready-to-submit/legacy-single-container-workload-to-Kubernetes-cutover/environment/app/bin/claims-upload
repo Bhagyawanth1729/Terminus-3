@@ -1,0 +1,5 @@
+#!/bin/sh
+# Placeholder binary stub. Do not modify. Real image is
+# registry.example.local/claims-upload:1.8.4
+echo "claims-upload stub: $*" >&2
+exit 0

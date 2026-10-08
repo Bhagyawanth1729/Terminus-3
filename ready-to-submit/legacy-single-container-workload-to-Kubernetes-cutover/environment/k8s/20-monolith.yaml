@@ -1,0 +1,48 @@
+# WIP cutover attempt — still models the legacy all-in-one host unit.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claims-upload
+  namespace: claims-upload
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claims-upload
+  template:
+    metadata:
+      labels:
+        app: claims-upload
+    spec:
+      containers:
+        - name: all-in-one
+          image: registry.example.local/claims-upload:1.8.4
+          command: ["/app/bin/claims-upload", "serve"]
+          # worker/cleanup/nginx/vector still missing as separate workloads
+          env:
+            - name: DB_PASSWORD
+              value: change-me
+            - name: SIGNING_KEY
+              value: change-me-too
+            - name: UPLOAD_ROOT
+              value: /var/claims/uploads
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: uploads
+              mountPath: /var/claims/uploads
+      volumes:
+        - name: uploads
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: claims-upload
+  namespace: claims-upload
+spec:
+  selector:
+    app: claims-upload
+  ports:
+    - port: 80
+      targetPort: 8080

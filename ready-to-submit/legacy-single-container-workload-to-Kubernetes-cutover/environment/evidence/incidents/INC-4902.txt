@@ -1,0 +1,13 @@
+INC-4902  severity=Sev2  status=open
+title: dry-run cutover had working Deployments but dead Service / PDB / NetworkPolicy
+
+reporter: platform-reliability
+summary:
+  A candidate manifest set spun healthy API pods, yet the Service selected
+  nothing, the PDB watched a different label set, and the NetworkPolicy
+  targeted yet another selector. Ports also drifted between containerPort,
+  Service port, scrape annotation, and proxy upstream. Individually each
+  object looked fine; together the traffic path and disruption budget were
+  incoherent.
+
+impact: false-green migration review; outage under real traffic/drain.

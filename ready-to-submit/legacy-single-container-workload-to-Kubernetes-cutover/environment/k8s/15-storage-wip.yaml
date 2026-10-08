@@ -1,0 +1,13 @@
+# Trap: RWO claim — cannot be shared by api/worker/cleanup the way the host volume was.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claims-upload-local
+  namespace: claims-upload
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 200Gi

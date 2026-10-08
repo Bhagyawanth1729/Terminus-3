@@ -1,0 +1,11 @@
+INC-4412  severity=Sev2  status=recurring
+title: claim PDF uploads disappear after API process restart
+
+reporter: claims-ops
+summary:
+  Users re-upload documents after overnight restarts. Files that were
+  accepted earlier in the evening are gone from the upload tree.
+  Host disk usage on the container rootfs drops after restart; the
+  shared upload path appears empty until new traffic arrives.
+
+impact: rework for adjusters; SLA misses on document intake.

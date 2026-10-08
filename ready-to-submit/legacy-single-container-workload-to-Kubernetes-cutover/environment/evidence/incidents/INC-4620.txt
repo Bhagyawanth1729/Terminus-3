@@ -1,0 +1,10 @@
+INC-4620  severity=Sev2  status=recurring
+title: HTTP 502 window during every deploy / restart
+
+reporter: edge-team
+summary:
+  Load balancer keeps sending traffic while the process is still
+  binding sockets and loading signing material. nginx returns 502 for
+  30–90s. No readiness distinction between "process up" and "serving".
+
+impact: failed uploads; noisy pager during planned changes.

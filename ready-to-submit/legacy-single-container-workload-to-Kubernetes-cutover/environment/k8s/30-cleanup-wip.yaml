@@ -1,0 +1,24 @@
+# Trap: looks like a cleanup CronJob but uses Allow concurrency and wrong schedule.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: claims-upload-cleanup-wip
+  namespace: claims-upload
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cleanup
+              image: registry.example.local/claims-upload:1.8.4
+              command: ["/app/bin/claims-upload", "cleanup"]
+              volumeMounts:
+                - name: uploads
+                  mountPath: /var/claims/uploads
+          volumes:
+            - name: uploads
+              emptyDir: {}

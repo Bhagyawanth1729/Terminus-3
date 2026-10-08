@@ -1,0 +1,10 @@
+INC-4825  severity=Sev2  status=open
+title: API pods schedule onto the same node during weekend maintenance
+
+reporter: platform-reliability
+summary:
+  When one worker node was drained, all API replicas landed on a single
+  remaining node. A kernel panic on that node took the whole HTTP surface
+  down despite replica count > 1. Scheduling must keep API replicas apart.
+
+impact: correlated outage during node failure / drain.

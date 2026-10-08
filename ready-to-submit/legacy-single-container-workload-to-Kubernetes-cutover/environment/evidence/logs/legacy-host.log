@@ -1,0 +1,11 @@
+Jun 12 02:14:01 claims-host1 claims-upload[441]: listen :8080
+Jun 12 02:14:01 claims-host1 claims-upload[441]: worker threads=8
+Jun 12 02:14:01 claims-host1 nginx[512]: start worker processes
+Jun 12 02:14:02 claims-host1 vector[530]: sink=loki
+Jun 12 03:17:00 claims-host1 claims-upload[441]: cleanup skipped reason=cpu_sat
+Jun 14 18:44:11 claims-host1 kernel: Out of memory: Killed process 441 (claims-upload)
+Jun 14 18:44:11 claims-host1 systemd[1]: claims-upload.service: Main process exited
+Jun 14 18:44:40 claims-host1 nginx[512]: connect() failed (111: Connection refused) while connecting to upstream
+Jun 15 09:02:18 claims-host1 claims-upload[441]: upload accepted id=A9182 path=/var/claims/uploads/A9182.pdf
+Jun 15 09:55:02 claims-host1 claims-upload[441]: restart
+Jun 15 09:55:04 claims-host1 claims-upload[441]: upload tree empty count=0

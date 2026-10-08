@@ -1,0 +1,11 @@
+INC-4811  severity=Sev2  status=open
+title: upload API reachable from every pod in the namespace
+
+reporter: security-eng
+summary:
+  During the cutover dry-run, a compromised batch Job in the same namespace
+  could open TCP 8080 on the API pods. There is no ingress restriction tying
+  API traffic to the front-door proxy component. Workers and cleanup Jobs do
+  not need to expose or accept that port.
+
+impact: expanded blast radius for any future namespace foothold.

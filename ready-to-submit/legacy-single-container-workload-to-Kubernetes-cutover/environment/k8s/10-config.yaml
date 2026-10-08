@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: claims-upload-config
+  namespace: claims-upload
+data:
+  UPLOAD_ROOT: /var/claims/uploads
+  MAX_UPLOAD_MB: "64"
+  LOG_LEVEL: info
+---
+# FIXME: security review rejected shipping secrets like this.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: claims-upload-secret
+  namespace: claims-upload
+type: Opaque
+stringData:
+  DB_PASSWORD: change-me
+  SIGNING_KEY: change-me-too

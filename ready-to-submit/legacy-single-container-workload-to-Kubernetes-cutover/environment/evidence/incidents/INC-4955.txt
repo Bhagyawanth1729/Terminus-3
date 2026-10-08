@@ -1,0 +1,13 @@
+INC-4955  severity=Sev2  status=open
+title: upload volumeMount name drifted from volume; probes pointed at wrong port
+
+reporter: platform-reliability
+summary:
+  A cutover draft mounted /var/claims/uploads under volumeMount name
+  "uploads" while the pod volume was still named "upload-data", so the PVC
+  never attached. Separately, readiness/liveness httpGet.port used a numeric
+  value that did not match the containerPort / Service targetPort / named
+  port chain. ConfigMap UPLOAD_ROOT still claimed the inventoried path.
+  Each field looked plausible alone; the mount and probe chains did not close.
+
+impact: API pods Running but unable to persist claims; readiness false-green.

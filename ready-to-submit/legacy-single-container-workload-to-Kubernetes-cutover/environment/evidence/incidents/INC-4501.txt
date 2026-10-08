@@ -1,0 +1,11 @@
+INC-4501  severity=Sev2  status=recurring
+title: nightly upload cleanup does not run during busy weeks
+
+reporter: platform-reliability
+summary:
+  Retention cleanup is supposed to run every night. During high claim
+  volume the cleanup timestamps stall for days. Host metrics show the
+  API and worker saturating CPU/RAM; the cleanup entrypoint is only
+  observed when the main processes are idle.
+
+impact: upload volume growth; compliance retention drift.
