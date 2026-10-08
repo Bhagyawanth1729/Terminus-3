@@ -1,0 +1,62 @@
+version = "2.0"
+name = "fleet-routing-jni-solver"
+category = "Operations"
+subcategory = "Logistics"
+tags = ["java", "rust", "python", "jni", "vrp", "logistics", "ffi", "concurrency"]
+languages = ["java", "rust", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Operations"
+subcategory = "Logistics"
+tags = ["java", "rust", "python", "jni", "vrp", "logistics", "ffi", "concurrency"]
+languages = ["java", "rust", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-language vehicle routing and dispatch stack (Java Spring/gRPC gateway -> Rust C-FFI / JNI solver library -> Python telematics validator daemon). \
+When Java serializes fleet demand and timestamp windows into shared JNI DirectByteBuffers, it encodes integers as big-endian while the Rust solver reads raw bytes as little-endian, corrupting departure timestamps and cargo weight constraints. \
+In the JNI interface layer, Java drops solver plan references without invoking native handle cleanup routines (releaseVrpPlanNative), causing native heap memory leaks and handle accumulation under high re-routing frequencies. \
+Additionally, Java emits route coordinate GeoJSON using default locale string formatting, producing comma-separated decimals (e.g. 48,8566) that break Python floating-point telemetry parsing. \
+Partial fixes (e.g. fixing locale formatting without repairing JNI endianness or native handle release) still fail holdout stress and concurrency tests.\
+"""
+
+solution_explanation = """\
+1. In Java (`DispatchGateway.java`), set JNI DirectByteBuffer byte order to ByteOrder.LITTLE_ENDIAN (or update Rust buffer parsing in `lib.rs` to use `u64::from_be_bytes`) to match binary layout specifications. \
+2. In Java (`DispatchGateway.java`), invoke `releaseVrpPlanNative(planHandle)` in a try-finally block or AutoCloseable handle to ensure native C-heap solver plans are deallocated after dispatch. \
+3. In Java (`DispatchGateway.java`), update floating-point formatting to explicitly specify `Locale.US` (`String.format(Locale.US, "%.6f", coord)`) so GeoJSON outputs standard dot-decimal floats. \
+4. Rebuild the system via `/app/build_all.sh` and execute the gateway pipeline to update `/app/output.json`.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate container and tests the rebuilt system against three independent axes of failure: \
+1) Exact time-window and capacity satisfaction on financial/logistics routing benchmarks, verifying endianness correction; \
+2) Native JNI handle memory count stability across 50 rapid solver re-optimizations, verifying zero C-heap memory leaks; \
+3) GeoJSON floating-point telemetry parsing in Python across global locale environments.\
+"""
+
+relevant_experience = """\
+Author has extensive experience building high-throughput logistics dispatch systems, JNI native wrappers (Java/C/Rust FFI), and cross-language telemetry pipelines.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

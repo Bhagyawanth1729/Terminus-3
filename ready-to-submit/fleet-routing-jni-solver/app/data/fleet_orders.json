@@ -1,0 +1,11 @@
+{
+  "orders": [
+    {
+      "order_id": 101,
+      "departure_time": 1700000000,
+      "weight_kg": 4500,
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    }
+  ]
+}
