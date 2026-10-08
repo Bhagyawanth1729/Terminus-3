@@ -1,0 +1,27 @@
+# Depot transfer batch — record layouts and rules
+
+Binding input/output layouts, reject-reason order and processing rules for the
+overnight depot transfer ledger. Delivery goals are in the task prompt
+(`instruction.md`).
+
+The program receives four paths through `--parts`, `--stock`, `--events`, and `--output`. Paths do not contain newline characters. A normal batch returns 0 even when business events are rejected. An unreadable input, malformed master record, duplicate master key, missing stock catalogue key, or summary arithmetic overflow is fatal and returns 2. Before any run, remove the four named reports from the output directory. A fatal run must not leave any of them behind.
+
+All inputs are ASCII fixed-width records with no delimiter. Trailing carriage returns are not data. Blank identifiers are invalid. Text fields compare byte-for-byte after removing trailing spaces; identifiers and codes use uppercase ASCII. Numeric fields contain digits only and are zero padded. Dates use `YYYYMMDD` and must be real calendar dates.
+
+`parts.dat` has length 21. Columns 1-10 are part ID, 11 is condition, 12-20 are unit value in cents, and 21 is active flag `Y` or `N`. The key is part ID plus condition. Unit value is 0 through 999999999. Duplicate keys are fatal.
+
+`stock.dat` has length 26. Columns 1-6 are depot, 7-16 part ID, 17 condition, and 18-26 opening quantity. The key is depot plus part ID plus condition. Quantity is 0 through 999999999. Each key must be unique and must use an active catalogue key; otherwise the batch is fatal.
+
+`events.dat` has length 81. Its columns are event ID 1-12, effective date 13-20, numeric sequence 21-24, type 25, reference event ID 26-37, transfer ID 38-49, source depot 50-55, destination depot 56-61, part ID 62-71, condition 72, and quantity 73-81. Process records by effective date, numeric sequence, then event ID. Equal sort keys retain input order. Empty event files are valid.
+
+The highest event quantity is 999999999. Dispatch `D` requires a blank reference, transfer ID equal to event ID, different nonblank depots, two known stock keys for the same active part and condition, a positive quantity, and enough source stock. It subtracts source stock and creates that quantity as open transit. Receipt `R` requires reference and transfer ID both equal to an earlier accepted, nonvoid dispatch. Its route, part, and condition must match that dispatch and its positive quantity cannot exceed current outstanding transit. Destination stock must remain at or below 999999999. It reduces transit and raises destination stock. The ledger's `active_received` quantity is the sum of accepted receipt quantities against a dispatch that have not been voided.
+
+Void `V` references one earlier accepted event. When it references a receipt, transfer ID and all route, part, condition, and quantity fields must match that receipt. The receipt must not already be void, and destination stock must still cover the receipt quantity. The void subtracts destination stock, restores the dispatch transit, and marks only that receipt void. When a void references a dispatch, transfer ID must equal that dispatch ID and all metadata including original quantity must match. The dispatch must not already be void and its active received quantity must be zero. The restored source quantity is its current quantity plus the dispatch's original quantity, and it cannot exceed 999999999. The void also removes the dispatch's remaining transit and marks it void. A voided receipt stays part of history and cannot be received or voided again.
+
+The first record for an event ID owns that identity whether accepted or rejected. A later record whose parsed fields all match is an ignored duplicate and increments `DUPLICATE_COUNT`. A later record that differs in any parsed field is rejected with `DUPLICATE_CONFLICT`. References must point to an earlier accepted event of the required kind. They cannot point to rejected, unknown, already voided, or later records.
+
+For a unique event, use the first applicable reason in this order: `BAD_DATE`, `BAD_SEQUENCE`, `BAD_TYPE`, `BAD_TRANSFER`, `BAD_REFERENCE`, `BAD_ROUTE`, `UNKNOWN_STOCK`, `INACTIVE_PART`, `BAD_QUANTITY`, `INSUFFICIENT_STOCK`, `EXCESS_RECEIPT`, `ALREADY_VOID`, `RECEIPTS_ACTIVE`, `OVERFLOW`. A conflicting reused ID always uses `DUPLICATE_CONFLICT`. Rejected events count once and make no state change.
+
+Write ASCII reports with LF endings. `closing-stock.dat` uses the 26-column stock layout and includes zero balances, sorted by depot, part ID, and condition. `open-transit.dat` includes only nonvoid dispatches with positive outstanding quantity, sorted by dispatch ID. Its layout is dispatch ID 1-12, source 13-18, destination 19-24, part 25-34, condition 35, original quantity 36-44, and outstanding quantity 45-53. `exceptions.dat` contains `event-id|reason` in business order.
+
+`summary.dat` contains these lines in this order: `INPUT_COUNT=value`, `ACCEPTED_COUNT=value`, `DUPLICATE_COUNT=value`, `REJECTED_COUNT=value`, `TOTAL_CLOSING_QTY=value`, `OPEN_TRANSIT_QTY=value`, `ONHAND_VALUE_CENTS=value`, and `TRANSIT_VALUE_CENTS=value`. Each value is a plain decimal integer. Values in cents are quantity multiplied by the matching catalogue unit cents and may not exceed 999999999999999999. The first four counts reconcile all input records.
