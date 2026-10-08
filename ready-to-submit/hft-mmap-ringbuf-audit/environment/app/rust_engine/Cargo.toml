@@ -1,0 +1,15 @@
+[package]
+name = "rust_engine"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rust_ringbuf"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "rust_producer"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2"

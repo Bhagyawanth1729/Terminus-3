@@ -1,0 +1,11 @@
+[package]
+name = "rust_hnsw"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rust_hnsw"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+libc = "0.2"

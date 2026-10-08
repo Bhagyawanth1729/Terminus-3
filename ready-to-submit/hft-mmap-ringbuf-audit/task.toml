@@ -1,0 +1,64 @@
+version = "2.0"
+name = "hft-mmap-ringbuf-audit"
+category = "Operations"
+subcategory = "Finance"
+tags = ["rust", "go", "java", "shared-memory", "ring-buffer", "grpc", "fixed-point", "concurrency", "finance"]
+languages = ["rust", "go", "java"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Operations"
+subcategory = "Finance"
+tags = ["rust", "go", "java", "shared-memory", "ring-buffer", "grpc", "fixed-point", "concurrency", "finance"]
+languages = ["rust", "go", "java"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-language HFT matching and audit pipeline (Rust IPC matching engine -> Go risk/compliance reader -> Java Spring gRPC audit ledger). \
+In Rust, the lock-free shared memory ring buffer (/tmp/orderbook_ring.buf) updates the write head index using Ordering::Relaxed atomic stores, causing CPU store reordering where the Go reader ingests un-flushed payload bytes (torn reads on 64-bit order IDs and price records) under high QPS. \
+In Go, 64-bit fixed-point prices (scaled by 10^8) are cast to float64 before gRPC transmission, introducing floating-point precision loss on large institutional orders. \
+In Go's gRPC stream handler, client disconnects drop contexts without calling C.free_reader_handle, leaking ring buffer reader handles and file descriptors. \
+In Java, audit summary formatting uses system default locale instead of Locale.US, emitting comma-separated decimals that break downstream JSON parsing. \
+Partial fixes (e.g. fixing Java locale without addressing Rust atomic store ordering or Go gRPC resource leaks) fail holdout concurrency and stress tests.\
+"""
+
+solution_explanation = """\
+1. In Rust (/app/rust_engine/src/ringbuf.rs), change atomic head sequence store ordering from Ordering::Relaxed to Ordering::Release to enforce payload memory flushes before reader inspection. \
+2. In Go (/app/go_compliance/grpc_client.go), preserve 64-bit integer fixed-point price arithmetic (or pass exact 64-bit integer values) rather than casting to lossy float64. \
+3. In Go (/app/go_compliance/stream_handler.go), listen for ctx.Done() or defer C.free_reader_handle(handle) to cleanly release native ring buffer reader handles on stream cancellation. \
+4. In Java (/app/java_audit/src/main/java/com/terminus/audit/AuditService.java), update decimal formatting to explicitly use Locale.US (String.format(Locale.US, "%.4f", value)). \
+5. Execute /app/build_all.sh and /app/run_pipeline.sh to update /app/output.json.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate container and tests the rebuilt system against three independent axes of failure: \
+1) Exact balance exactness and JSON schema validation on /app/output.json; \
+2) Lock-free shared memory ring buffer concurrency under multi-threaded holdout trade tick replay, verifying zero torn reads or corrupted order IDs; \
+3) Reader handle and file descriptor stability across 50 rapid stream disconnects, verifying zero handle leaks.\
+"""
+
+relevant_experience = """\
+Author has extensive experience building low-latency HFT matching engines, lock-free IPC ring buffers, multi-language gRPC microservices, and quantitative audit software.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

@@ -1,0 +1,62 @@
+version = "2.0"
+name = "hnsw-cgo-rust-ringbuf"
+category = "ML"
+subcategory = "Inference"
+tags = ["go", "rust", "python", "cgo", "hnsw", "vector-search", "ring-buffer", "shared-memory", "grpc"]
+languages = ["go", "rust", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "ML"
+subcategory = "Inference"
+tags = ["go", "rust", "python", "cgo", "hnsw", "vector-search", "ring-buffer", "shared-memory", "grpc"]
+languages = ["go", "rust", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-language hybrid vector retrieval pipeline (Go gRPC query server -> Rust C-FFI HNSW graph engine -> Python shared-memory IPC re-ranker). \
+When node IDs exceed 2^31 - 1, Go's cgo type wrapper sign-extends u64 node IDs to signed int64, causing high-bit node IDs to wrap to negative values and truncate graph traversal. \
+In the lock-free shared memory ring buffer (/tmp/hnsw_ring.buf), Rust updates the write head sequence using Relaxed atomic ordering instead of Release memory fences, causing CPU store reordering where the Python re-ranker reads un-flushed payload bytes (torn reads) under high QPS. \
+Additionally, when gRPC clients cancel search streams mid-flight, Go drops the context without invoking native Rust handle cleanup routines (cgo_free_search_ctx), leaking native heap memory. \
+Partial fixes (e.g. fixing Go sign extension without fixing Rust atomic memory fences or C-FFI handle leaks) still fail holdout stress and concurrency tests.\
+"""
+
+solution_explanation = """\
+1. In Go (`go-retrieval-server/hnsw_bridge.go`), cast C uint64_t node IDs directly to Go uint64 (`uint64(cResult.node_id)`) instead of int64, preserving high-bit node IDs (> 2^31 - 1). \
+2. In Rust (`librust_hnsw/src/ringbuf.rs`), update the atomic write head counter store from `Ordering::Relaxed` to `Ordering::Release` to guarantee payload memory flushes are visible to the Python reader. \
+3. In Go (`go-retrieval-server/stream_handler.go`), listen for `ctx.Done()` in the gRPC stream handler and defer `C.hnsw_free_search_ctx(handle)` to ensure C-FFI native contexts are released on client cancellation. \
+4. Rebuild the Rust C-FFI shared library (`librust_hnsw.so`) and Go retrieval binary (`go-retrieval-server`), then run `/app/build_and_run.sh` to execute the benchmark pipeline and produce `/app/output.json`.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate container and tests the rebuilt system against three independent axes of failure: \
+1) Exact top-k cosine recall precision on financial/scientific embedding benchmarks, ensuring 64-bit node IDs > 2^31 - 1 are preserved without sign corruption; \
+2) Lock-free shared memory ring buffer concurrency under multi-threaded load, verifying zero torn reads or corrupted payload bytes; \
+3) Post-cancellation memory and handle count stability across 50 rapid stream aborts, verifying zero native heap leaks.\
+"""
+
+relevant_experience = """\
+Author has extensive experience authoring high-throughput vector search engines, cross-language cgo/C-FFI bindings, lock-free IPC ring buffers, and distributed inference gateways.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

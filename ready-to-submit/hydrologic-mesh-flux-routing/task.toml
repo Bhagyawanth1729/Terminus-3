@@ -1,0 +1,56 @@
+name = "hydrologic-mesh-flux-routing"
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Science"
+subcategory = "Earth"
+tags = ["rust", "python", "hydrology", "shallow-water", "spatial-mesh", "kinematic-wave", "flux-limiter", "ipc"]
+languages = ["rust", "python"]
+difficulty = "advanced"
+expert_time_estimate_hours = 6
+
+difficulty_explanation = """\
+Agents must diagnose and repair a coupled cross-language hydrologic routing simulation (Python GIS orchestrator -> UNIX domain socket / POSIX shared memory IPC -> Rust 2D kinematic/diffusive wave mesh flux solver). \
+Multiple interacting defects cause severe physical mass conservation violations and distorted downstream hydrographs: \
+1) A binary struct memory layout mismatch across the C-ABI / IPC boundary (Python's struct packing ordering vs Rust's #[repr(C)] cell attribute fields) transposes Manning roughness and bed slope, causing incorrect wave celerity; \
+2) The Rust flux limiter allows unphysical negative water depths and non-conservative outflow during wet-to-dry cell transitions along the moving wetting front, leaking mass; \
+3) Python's hydrograph timeseries aggregator interprets millisecond timestep deltas as seconds when accumulating subcatchment routing lags, introducing severe phase distortion in hydrograph peak arrival. \
+Fixing one side in isolation without diagnosing the cross-language IPC layout and physical flux invariants still fails the strict conservation and Nash-Sutcliffe efficiency (NSE) checks.\
+"""
+
+solution_explanation = """\
+1. In `rust_solver/src/ipc.rs` and `watershed/mesh.py`, align the binary `CellState` struct field order (elevation: f64, area: f64, manning_n: f64, slope: f64, water_depth: f64, flags: u32, pad: u32) to match exact C-ABI alignment. \
+2. In `rust_solver/src/flux.rs`, implement an upwind volume-conserving flux limiter that clamps outflow delta_V <= h_i * A_i during wetting-front transitions, ensuring non-negative water depth h >= 0 and zero artificial mass creation/destruction. \
+3. In `watershed/orchestrator.py`, correct the timestep scaling factor when framing IPC packets and accumulating hydrographs. \
+4. Recompile the Rust solver binary with `cargo build --release` and run `/app/run_simulation.py` to produce the verified CF-compliant NetCDF hydrograph.\
+"""
+
+verification_explanation = """\
+The verifier runs in an isolated container and evaluates the agent's rebuilt system across four independent axes: \
+1) Strict mass balance conservation across the entire triangular mesh (relative error < 1e-4%); \
+2) Hydrograph hydrodynamic fidelity against reference gauges (Nash-Sutcliffe Efficiency NSE > 0.98, peak timing error = 0); \
+3) Structural and metadata CF-1.8 compliance of `/app/output/watershed_discharge.nc`; \
+4) Metamorphic holdout test: Re-executing the compiled binary against an unseen, severe convective storm event (`/tests/holdout/storm_extreme.nc`) to verify that the flux limiter generalizes without numerical blowups or mass leaks.\
+"""
+
+relevant_experience = """\
+Author has over 8 years of experience in computational hydrology, geophysical fluid dynamics modeling, and building high-performance numerical simulation pipelines across Rust and Python.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240

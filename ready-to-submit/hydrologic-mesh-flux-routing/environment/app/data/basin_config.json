@@ -1,0 +1,10 @@
+{
+  "basin_name": "Clearwater Creek Mountain Catchment",
+  "basin_area_m2": 240204.95,
+  "mesh_file": "data/mesh_tin.json",
+  "forcing_file": "data/rainfall_forcing.nc",
+  "channel_routing": {
+    "reach_lag_seconds": 40.0,
+    "manning_n_channel": 0.032
+  }
+}
