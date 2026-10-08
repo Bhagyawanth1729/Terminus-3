@@ -1,0 +1,5 @@
+shards_dir = "/app/data"
+shards = ["shard_a", "shard_b"]
+output_cpk = "/app/output/merged.cpk"
+output_stats = "/app/output/stats.json"
+colpack_bin = "/app/colpack-rs/target/release/colpack"

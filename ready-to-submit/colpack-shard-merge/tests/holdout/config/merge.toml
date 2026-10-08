@@ -1,0 +1,5 @@
+shards_dir = "/tests/holdout/data"
+shards = ["shard_c", "shard_d"]
+output_cpk = "/work/out/holdout_merged.cpk"
+output_stats = "/work/out/holdout_stats.json"
+colpack_bin = "/app/colpack-rs/target/release/colpack"

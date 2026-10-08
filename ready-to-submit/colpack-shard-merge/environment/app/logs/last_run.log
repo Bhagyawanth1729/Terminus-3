@@ -1,0 +1,9 @@
+2026-03-18T14:02:11Z INFO  pipeline: encoding /app/data/shard_a.csv
+2026-03-18T14:02:11Z INFO  pipeline: encoding /app/data/shard_b.csv
+2026-03-18T14:02:11Z INFO  colpack: merging 2 shards
+Error: InvalidData("crc mismatch")
+  at cpk_writer footer for shard_b.cpk — downstream rejects merged archive
+2026-03-18T14:02:11Z WARN  ingest: merged row count 3 != expected 6 for six data rows
+2026-03-18T14:02:11Z WARN  ingest: string column values corrupted (dictionary not honored)
+
+Hint: compare /app/docs/colpack_v2.md against cpk_writer.py and colpack-rs/src/main.rs

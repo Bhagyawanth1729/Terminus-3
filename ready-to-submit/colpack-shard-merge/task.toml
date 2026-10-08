@@ -1,0 +1,59 @@
+version = "2.0"
+name = "colpack-shard-merge"
+category = "Software"
+subcategory = "Data engineering"
+tags = ["colpack", "rust", "python", "binary-format", "etl", "merge"]
+languages = ["python", "rust"]
+difficulty = "advanced"
+expert_time_estimate_hours = 6
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+
+difficulty_explanation = """\
+Agents must reconcile a custom ColPack v2 wire spec with two implementations: a Python shard \
+encoder and a Rust merge binary. The Python side omits the HAS_DICT flag and computes CRC over \
+the wrong byte range, so shards look plausible until the Rust parser validates footers. The Rust \
+side misreads body-relative offsets as absolute file offsets and merges row counts with max \
+instead of sum — either defect alone leaves stats.json inconsistent with merged.cpk. Partial \
+fixes (encoder only or merger only) still fail held-out re-runs because the verifier re-executes \
+the full pipeline on unseen shards.\
+"""
+
+solution_explanation = """\
+Read colpack_v2.md and last_run.log, then diff cpk_writer.py and main.rs against the spec. Fix \
+HAS_DICT and header+body CRC in Python, fix body-relative payload addressing and row-count summation \
+in Rust, rebuild with cargo build --release, and run run_merge.py. The manifest fields are derived \
+from the merged artifact, not hand-authored.\
+"""
+
+verification_explanation = """\
+The verifier checks byte-identical merged.cpk and stats.json for shipped inputs, then re-runs the \
+agent's rebuilt pipeline on holdout shard directories via run_merge.py. Golden SHA-256 hashes \
+catch hand-written outputs; holdout re-runs catch encoder/merger fixes that only work on the \
+bundled CSVs. Schema and row-count checks ensure merge semantics, not just footer magic.\
+"""
+
+relevant_experience = """\
+Author has built cross-language ETL pipelines with custom binary interchange formats and debugged \
+FFI/wire-compat issues between Python orchestrators and Rust compute binaries.\
+"""
+
+[verifier]
+timeout_sec = 900
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"
