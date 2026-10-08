@@ -1,0 +1,89 @@
+{
+  "service": "claims-upload-service",
+  "namespace": "claims-upload",
+  "image": "registry.example.local/claims-upload:1.8.4",
+  "service_account": "claims-upload",
+  "components": {
+    "label_key": "app.kubernetes.io/component",
+    "api": "api",
+    "worker": "worker",
+    "cleanup": "cleanup",
+    "proxy": "proxy"
+  },
+  "roles": {
+    "api": {
+      "command": ["/app/bin/claims-upload", "serve"],
+      "container_port": 8080,
+      "health_path": "/healthz",
+      "ready_path": "/readyz",
+      "mounts": [{"name": "upload-data", "path": "/var/claims/uploads"}]
+    },
+    "worker": {
+      "command": ["/app/bin/claims-upload", "worker"],
+      "mounts": [{"name": "upload-data", "path": "/var/claims/uploads"}]
+    },
+    "cleanup": {
+      "command": ["/app/bin/claims-upload", "cleanup"],
+      "schedule": "17 3 * * *",
+      "concurrency_policy": "Forbid",
+      "mounts": [{"name": "upload-data", "path": "/var/claims/uploads"}]
+    },
+    "proxy": {
+      "image": "registry.example.local/nginx-claims-proxy:1.25.4",
+      "container_port": 80,
+      "upstream_service": "claims-upload-api",
+      "upstream_port": 8080
+    },
+    "log-forwarder": {
+      "image": "registry.example.local/vector:0.34.1",
+      "sidecar_of": ["api", "worker"]
+    }
+  },
+  "config_map": "claims-upload-config",
+  "secret": "claims-upload-secret",
+  "config_keys": ["UPLOAD_ROOT", "MAX_UPLOAD_MB", "LOG_LEVEL"],
+  "secret_keys": ["DB_PASSWORD", "SIGNING_KEY"],
+  "config_upload_root_key": "UPLOAD_ROOT",
+  "storage": {
+    "pvc_name": "claims-upload-data",
+    "access_modes": ["ReadWriteMany"],
+    "size": "200Gi",
+    "storage_class": "nfs-retain"
+  },
+  "availability": {
+    "api_replicas": 3,
+    "worker_replicas": 2,
+    "api_pdb_min_available": 2,
+    "api_rolling_update": {"maxUnavailable": 1, "maxSurge": 1},
+    "api_pod_anti_affinity": "required"
+  },
+  "resources": {
+    "api": {
+      "requests": {"cpu": "250m", "memory": "512Mi"},
+      "limits": {"cpu": "1", "memory": "1Gi"}
+    },
+    "worker": {
+      "requests": {"cpu": "500m", "memory": "1Gi"},
+      "limits": {"cpu": "2", "memory": "2Gi"}
+    }
+  },
+  "security": {
+    "run_as_non_root": true,
+    "allow_privilege_escalation": false,
+    "read_only_root_filesystem": true,
+    "capabilities_drop": ["ALL"],
+    "forbid_privileged": true,
+    "forbid_host_path": true,
+    "fs_group": 1000
+  },
+  "network_policy": {
+    "name": "claims-upload-api-ingress",
+    "api_component": "api",
+    "allow_from_components": ["proxy"],
+    "api_port": 8080
+  },
+  "labels": {
+    "app.kubernetes.io/name": "claims-upload",
+    "app.kubernetes.io/part-of": "claims-platform"
+  }
+}
