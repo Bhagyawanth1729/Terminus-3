@@ -1,0 +1,63 @@
+version = "2.0"
+name = "genomic-kmer-bloom-aligner"
+category = "Science"
+subcategory = "Biology"
+tags = ["rust", "java", "python", "genomics", "fastq", "vcf", "phred", "c-ffi", "shared-memory", "grpc"]
+languages = ["rust", "java", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Science"
+subcategory = "Biology"
+tags = ["rust", "java", "python", "genomics", "fastq", "vcf", "phred", "c-ffi", "shared-memory", "grpc"]
+languages = ["rust", "java", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-language genomic sequence processing and variant discovery pipeline (Java Spring/gRPC sequence streaming gateway -> Rust C-FFI k-mer dynamic programming alignment engine -> Python IPC variant annotation daemon). \
+In Rust, write-head sequence indexes for the lock-free shared memory IPC ring buffer (/tmp/genomic_align.buf) are committed using Ordering::Relaxed atomic stores, causing CPU store reordering where the Python reader ingests un-flushed sequence data (torn reads and corrupted genomic positions) under multi-threaded loads. \
+In Java, gRPC stream cancellations drop client contexts without invoking native handle cleanup (nativeReleaseAlignerHandle), causing C-heap native alignment matrix leaks and file descriptor exhaustion during rapid streaming restarts. \
+In Python, quality score parsing misinterprets Sanger Phred Q+33 ASCII byte encoding as Illumina Q+64 offset, corrupting variant probability confidence metrics in /app/output.json. \
+Partial fixes (e.g. fixing Python Phred offsets without repairing Rust atomic fence ordering or Java gRPC handle deallocation) still fail holdout stress and concurrency tests.\
+"""
+
+solution_explanation = """\
+1. In Rust (/app/rust_aligner/src/ringbuf.rs), change atomic head sequence store ordering from Ordering::Relaxed to Ordering::Release to enforce payload memory flushes before reader inspection. \
+2. In Java (/app/java_gateway/src/main/java/com/terminus/genomics/SequenceStreamService.java), attach a gRPC CancellationListener or try-finally cleanup block to call nativeReleaseAlignerHandle(alignerPtr) on stream termination. \
+3. In Python (/app/python_annotator/annotator.py), update Phred quality score calculation to subtract 33 (Sanger format Q+33: ord(char) - 33) instead of 64 (Illumina format). \
+4. Run /app/build_and_run.sh to recompile the Rust shared library (librust_aligner.so) and Java gateway jar, then execute the pipeline to generate /app/output.json.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate container and tests the rebuilt system against four independent axes of failure: \
+1) Exact VCF variant record schema, allele frequency, and Phred quality score precision in /app/output.json; \
+2) Re-running the rebuilt pipeline on unseen holdout FASTQ datasets in /tests/holdout/ via unprivileged sandbox execution; \
+3) Lock-free shared memory ring buffer concurrency under high QPS tick replay, verifying zero torn reads or corrupted sequence positions; \
+4) Native C-heap handle count and file descriptor stability across 50 rapid gRPC stream cancellations, verifying zero resource leaks.\
+"""
+
+relevant_experience = """\
+Author has extensive experience authoring high-throughput genomic sequence aligners, cross-language FFI bindings (Rust/Java JNI/C-FFI), lock-free IPC ring buffers, and bioinformatics variant calling pipelines.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"
