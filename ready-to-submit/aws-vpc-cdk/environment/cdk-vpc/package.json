@@ -1,0 +1,20 @@
+{
+  "name": "payments-vpc-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Synthesis-only CDK construct for the payments VPC network baseline.",
+  "license": "Apache-2.0",
+  "main": "lib/network-fabric.js",
+  "bin": {
+    "payments-vpc-synth": "bin/synth.js"
+  },
+  "scripts": {
+    "synth": "node bin/synth.js --config /app/config/payments-network.json --out /app/cdk.out",
+    "check": "node bin/synth.js --config /app/config/payments-network.json --out /tmp/cdk-check"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.155.0",
+    "constructs": "10.3.0"
+  },
+  "devDependencies": {}
+}

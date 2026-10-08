@@ -1,0 +1,65 @@
+{
+  "name": "settlement-prod",
+  "account": "444455556666",
+  "region": "us-west-2",
+  "cidr": "10.80.0.0/16",
+  "secondaryCidrs": ["10.90.0.0/16"],
+  "enableIpv6": true,
+  "privateIpv6Egress": true,
+  "enableNatGateway": true,
+  "singleNatGateway": false,
+  "oneNatGatewayPerAz": true,
+  "databaseSubnetsRouteToNat": false,
+  "availabilityZones": ["us-west-2a", "us-west-2b", "us-west-2c"],
+  "tags": {
+    "Application": "settlement",
+    "Environment": "prod",
+    "Owner": "network-platform"
+  },
+  "subnetTags": {
+    "private": {"Access": "egress"},
+    "database": {"Access": "isolated"}
+  },
+  "subnets": [
+    {"name": "public-a", "tier": "public", "az": "us-west-2a", "cidr": "10.80.0.0/24", "ipv6Index": 0},
+    {"name": "public-b", "tier": "public", "az": "us-west-2b", "cidr": "10.80.1.0/24", "ipv6Index": 1},
+    {"name": "public-c", "tier": "public", "az": "us-west-2c", "cidr": "10.80.2.0/24", "ipv6Index": 2},
+    {"name": "private-a", "tier": "private", "az": "us-west-2a", "cidr": "10.80.10.0/24", "ipv6Index": 10},
+    {"name": "private-b", "tier": "private", "az": "us-west-2b", "cidr": "10.80.11.0/24", "ipv6Index": 11},
+    {"name": "private-c", "tier": "private", "az": "us-west-2c", "cidr": "10.80.12.0/24", "ipv6Index": 12},
+    {"name": "database-a", "tier": "database", "az": "us-west-2a", "cidr": "10.80.20.0/24", "ipv6Index": 20},
+    {"name": "database-b", "tier": "database", "az": "us-west-2b", "cidr": "10.80.21.0/24", "ipv6Index": 21},
+    {"name": "database-c", "tier": "database", "az": "us-west-2c", "cidr": "10.80.22.0/24", "ipv6Index": 22},
+    {"name": "intra-a", "tier": "intra", "az": "us-west-2a", "cidr": "10.90.30.0/24", "ipv6Index": 30},
+    {"name": "intra-b", "tier": "intra", "az": "us-west-2b", "cidr": "10.90.31.0/24", "ipv6Index": 31},
+    {"name": "intra-c", "tier": "intra", "az": "us-west-2c", "cidr": "10.90.32.0/24", "ipv6Index": 32}
+  ],
+  "gatewayEndpoints": [
+    {"service": "s3", "tiers": ["private", "database"]},
+    {"service": "dynamodb", "tiers": ["private"]}
+  ],
+  "interfaceEndpoints": [
+    {"service": "ssm", "tiers": ["private"]},
+    {"service": "logs", "tiers": ["private"]},
+    {"service": "secretsmanager", "tiers": ["private"]}
+  ],
+  "networkAcls": {
+    "public": [
+      {"rule": 100, "egress": false, "protocol": 6, "action": "allow", "cidr": "0.0.0.0/0", "fromPort": 443, "toPort": 443},
+      {"rule": 110, "egress": true, "protocol": -1, "action": "allow", "cidr": "0.0.0.0/0", "fromPort": 0, "toPort": 0}
+    ],
+    "private": [
+      {"rule": 100, "egress": false, "protocol": 6, "action": "allow", "cidr": "10.80.0.0/16", "fromPort": 443, "toPort": 443},
+      {"rule": 110, "egress": true, "protocol": 6, "action": "allow", "cidr": "0.0.0.0/0", "fromPort": 443, "toPort": 443}
+    ],
+    "database": [
+      {"rule": 100, "egress": false, "protocol": 6, "action": "allow", "cidr": "10.80.10.0/23", "fromPort": 5432, "toPort": 5432},
+      {"rule": 110, "egress": true, "protocol": 6, "action": "allow", "cidr": "10.80.10.0/23", "fromPort": 5432, "toPort": 5432}
+    ]
+  },
+  "flowLogs": {
+    "enabled": true,
+    "trafficType": "ALL",
+    "retentionDays": 90
+  }
+}
