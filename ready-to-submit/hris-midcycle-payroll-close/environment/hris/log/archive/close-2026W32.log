@@ -1,0 +1,8 @@
+2026-08-07T18:12:11Z close-payroll period=2026-W32 operator=payroll-ops
+WARN transfer E000001 effective=2026-08-04 cost_center=CC-FIN-14 flsa=exempt leave_plan=PTO-EX was posted to assignments but register still shows CC-WH-02 / non_exempt
+WARN E000002 exempt salary line received overtime_pay > 0
+WARN E000004 punches after cutoff_at=2026-08-07T18:00:00Z were included in regular_hours
+WARN second close-payroll appended duplicate lines employee_count jumped
+token file=/app/hris/var/idp.token (local fake IdP; Okta disabled)
+db=/app/hris/var/hris.db
+out=/app/hris/out/payroll-register.json

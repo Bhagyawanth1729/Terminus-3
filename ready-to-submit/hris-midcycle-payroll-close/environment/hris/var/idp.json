@@ -1,0 +1,5 @@
+{
+  "issuer": "hris-local",
+  "audience": "hrctl",
+  "subject": "payroll-ops"
+}

@@ -1,0 +1,28 @@
+version = "2.0"
+name = "hris-midcycle-payroll-close"
+category = "Operations"
+subcategory = "Compliance"
+tags = ["payroll", "flsa", "leave", "attendance", "sqlite"]
+languages = ["python", "sql", "bash"]
+difficulty = "advanced"
+expert_time_estimate_hours = 11
+artifacts = ["/app/hris"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+
+[verifier]
+timeout_sec = 2400
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 9000
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"
