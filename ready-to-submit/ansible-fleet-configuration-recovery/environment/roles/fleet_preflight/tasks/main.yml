@@ -1,0 +1,22 @@
+---
+- name: Confirm required variable roots exist
+  assert:
+    that:
+      - fleet_site_defaults is mapping
+      - fleet_site_overrides is mapping
+      - fleet_certificates is iterable
+
+- name: Derive local site
+  set_fact:
+    fleet_site: "{{ group_names | intersect(['blr', 'maa', 'hyd']) | first }}"
+
+- name: Select site override
+  set_fact:
+    fleet_effective_settings: "{{ fleet_site_defaults | combine(fleet_site_overrides[fleet_site], recursive=True) }}"
+
+- name: Validate application settings shape
+  assert:
+    that:
+      - fleet_effective_settings.application is mapping
+      - fleet_effective_settings.application.dependencies is mapping
+      - fleet_effective_settings.application.listen.port | int > 0

@@ -1,0 +1,8 @@
+fleet_vault:
+  application:
+    database_password: "Prod-Checkout-Temporary-Password"
+    signing_token: "prod-signing-token-placeholder"
+  proxy:
+    upstream_shared_secret: "proxy-shared-secret-placeholder"
+  telemetry:
+    remote_write_token: "telemetry-token-placeholder"

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${ROOT}"
+export ANSIBLE_NOCOWS=1
+export PYTHONPATH="${ROOT}/lib${PYTHONPATH:+:${PYTHONPATH}}"
+exec ansible-playbook "$@"

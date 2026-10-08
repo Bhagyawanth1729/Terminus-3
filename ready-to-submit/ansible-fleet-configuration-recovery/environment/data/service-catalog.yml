@@ -1,0 +1,345 @@
+schema: fleet-service-catalog/v1
+services:
+- name: checkout
+  owner: platform-commerce
+  port: 8080
+  replicas: 2
+  health:
+    path: /health/ready
+    interval_seconds: 10
+    timeout_seconds: 2
+    success_threshold: 1
+    failure_threshold: 3
+  resources:
+    cpu_millicores: 250
+    memory_mb: 256
+    max_connections: 200
+  dependencies:
+  - catalog
+  - pricing
+  - inventory
+  - payments
+  - identity
+  sites: [blr, maa, hyd]
+  environments: [all]
+  routing: {protocol: grpc, sticky: true, retry_count: 1, circuit_breaker_threshold: 20}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: catalog
+  owner: platform-money
+  port: 8081
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 3, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 350, memory_mb: 384, max_connections: 250}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 25}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: inventory
+  owner: platform-core
+  port: 8082
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 2, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 450, memory_mb: 512, max_connections: 300}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 30}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: pricing
+  owner: platform-experience
+  port: 8083
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 3, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 550, memory_mb: 640, max_connections: 350}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 1, circuit_breaker_threshold: 35}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: payments
+  owner: platform-commerce
+  port: 8084
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 2, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 650, memory_mb: 256, max_connections: 400}
+  dependencies: [fraud, ledger, identity]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 40}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: fraud
+  owner: platform-money
+  port: 8085
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 3, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 250, memory_mb: 384, max_connections: 450}
+  dependencies: []
+  sites: [blr, maa, hyd]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 20}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: orders
+  owner: platform-core
+  port: 8086
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 2, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 350, memory_mb: 512, max_connections: 200}
+  dependencies: [checkout, shipping, notification]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: grpc, sticky: false, retry_count: 1, circuit_breaker_threshold: 25}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: shipping
+  owner: platform-experience
+  port: 8087
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 3, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 450, memory_mb: 640, max_connections: 250}
+  dependencies: [address, inventory]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: true, retry_count: 2, circuit_breaker_threshold: 30}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: identity
+  owner: platform-commerce
+  port: 8088
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 2, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 550, memory_mb: 256, max_connections: 300}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 35}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: customer
+  owner: platform-money
+  port: 8089
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 3, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 650, memory_mb: 384, max_connections: 350}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 1, circuit_breaker_threshold: 40}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: search
+  owner: platform-core
+  port: 8090
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 2, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 250, memory_mb: 512, max_connections: 400}
+  dependencies: []
+  sites: [blr, maa, hyd]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 20}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: recommendation
+  owner: platform-experience
+  port: 8091
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 3, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 350, memory_mb: 640, max_connections: 450}
+  dependencies: [catalog, feature]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 25}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: notification
+  owner: platform-commerce
+  port: 8092
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 2, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 450, memory_mb: 256, max_connections: 200}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: grpc, sticky: false, retry_count: 1, circuit_breaker_threshold: 30}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: audit
+  owner: platform-money
+  port: 8093
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 3, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 550, memory_mb: 384, max_connections: 250}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 35}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: ledger
+  owner: platform-core
+  port: 8094
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 2, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 650, memory_mb: 512, max_connections: 300}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: true, retry_count: 3, circuit_breaker_threshold: 40}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: tax
+  owner: platform-experience
+  port: 8095
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 3, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 250, memory_mb: 640, max_connections: 350}
+  dependencies: []
+  sites: [blr, maa, hyd]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 1, circuit_breaker_threshold: 20}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: returns
+  owner: platform-commerce
+  port: 8096
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 2, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 350, memory_mb: 256, max_connections: 400}
+  dependencies: [orders, ledger]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 25}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: promotions
+  owner: platform-money
+  port: 8097
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 3, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 450, memory_mb: 384, max_connections: 450}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 30}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: loyalty
+  owner: platform-core
+  port: 8098
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 2, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 550, memory_mb: 512, max_connections: 200}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: grpc, sticky: false, retry_count: 1, circuit_breaker_threshold: 35}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: support
+  owner: platform-experience
+  port: 8099
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 3, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 650, memory_mb: 640, max_connections: 250}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 40}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: merchant
+  owner: platform-commerce
+  port: 8100
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 2, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 250, memory_mb: 256, max_connections: 300}
+  dependencies: []
+  sites: [blr, maa, hyd]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 20}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: settlement
+  owner: platform-money
+  port: 8101
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 3, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 350, memory_mb: 384, max_connections: 350}
+  dependencies: [ledger, merchant]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: true, retry_count: 1, circuit_breaker_threshold: 25}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: reporting
+  owner: platform-core
+  port: 8102
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 2, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 450, memory_mb: 512, max_connections: 400}
+  dependencies: [ledger, audit]
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 30}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: risk
+  owner: platform-experience
+  port: 8103
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 3, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 550, memory_mb: 640, max_connections: 450}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 35}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: feature
+  owner: platform-commerce
+  port: 8104
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 2, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 650, memory_mb: 256, max_connections: 200}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: grpc, sticky: false, retry_count: 1, circuit_breaker_threshold: 40}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: media
+  owner: platform-money
+  port: 8105
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 3, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 250, memory_mb: 384, max_connections: 250}
+  dependencies: []
+  sites: [blr, maa, hyd]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 2, circuit_breaker_threshold: 20}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}
+- name: address
+  owner: platform-core
+  port: 8106
+  replicas: 4
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 2, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 350, memory_mb: 512, max_connections: 300}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 25}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.15, log_level: info}
+- name: workflow
+  owner: platform-experience
+  port: 8107
+  replicas: 5
+  health: {path: /health/ready, interval_seconds: 10, timeout_seconds: 3, success_threshold: 1, failure_threshold: 3}
+  resources: {cpu_millicores: 450, memory_mb: 640, max_connections: 350}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 1, circuit_breaker_threshold: 30}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.2, log_level: debug}
+- name: scheduler
+  owner: platform-commerce
+  port: 8108
+  replicas: 2
+  health: {path: /health/ready, interval_seconds: 15, timeout_seconds: 2, success_threshold: 1, failure_threshold: 4}
+  resources: {cpu_millicores: 550, memory_mb: 256, max_connections: 400}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: true, retry_count: 2, circuit_breaker_threshold: 35}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.05, log_level: info}
+- name: webhook
+  owner: platform-money
+  port: 8109
+  replicas: 3
+  health: {path: /health/ready, interval_seconds: 20, timeout_seconds: 3, success_threshold: 1, failure_threshold: 5}
+  resources: {cpu_millicores: 650, memory_mb: 384, max_connections: 450}
+  dependencies: []
+  sites: [all]
+  environments: [all]
+  routing: {protocol: http, sticky: false, retry_count: 3, circuit_breaker_threshold: 40}
+  telemetry: {metrics_path: /metrics, tracing_sample_rate: 0.1, log_level: warn}

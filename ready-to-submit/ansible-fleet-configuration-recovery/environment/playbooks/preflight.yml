@@ -1,0 +1,42 @@
+---
+- name: Controller and project preflight
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    expected_config_basename: ansible.cfg
+  tasks:
+    - name: Capture controller version
+      command: ansible --version
+      register: controller_version
+      changed_when: false
+
+    - name: Capture active configuration
+      command: ansible-config dump --only-changed
+      register: controller_config
+      changed_when: false
+
+    - name: Require supported project bootstrap contract
+      assert:
+        that:
+          - controller_version.stdout is ansible.builtin.truthy
+          - expected_config_basename in controller_version.stdout
+        fail_msg: Controller runtime is not using the project configuration contract
+
+- name: Fleet data preflight
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Validate site mapping
+      assert:
+        that:
+          - fleet_site_defaults is mapping
+          - fleet_site_overrides is mapping
+          - fleet_environment in ['prod', 'staging']
+
+    - name: Validate required fleet groups
+      assert:
+        that:
+          - groups[item] is defined
+          - groups[item] | length > 0
+      loop: "{{ fleet_required_groups }}"

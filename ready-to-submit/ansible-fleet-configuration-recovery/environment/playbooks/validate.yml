@@ -1,0 +1,31 @@
+---
+- name: Validate fleet invariants
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify rendered artifact contract
+      assert:
+        that:
+          - item.path is file
+          - item.mode is match('^0[0-7]{3}$')
+          - item.owner | length > 0
+        fail_msg: "invalid artifact contract for {{ item.path | default('unknown') }}"
+      vars:
+        artifact_contracts:
+          - {path: /etc/fleet/identity.json, mode: '0640', owner: root}
+          - {path: /etc/fleet/application.yml, mode: '0640', owner: root}
+          - {path: /etc/nginx/conf.d/fleet.conf, mode: '0644', owner: root}
+          - {path: /etc/telemetry/targets.yml, mode: '0640', owner: root}
+          - {path: /etc/fleet/policy.conf, mode: '0640', owner: root}
+      loop_control:
+        label: "{{ item.path }}"
+      with_items: "{{ artifact_contracts }}"
+
+    - name: Validate backend cardinality by site
+      assert:
+        that:
+          - fleet_backend_projection[item] is defined
+          - fleet_backend_projection[item] | length >= 2
+      loop: "{{ ['blr', 'maa', 'hyd'] }}"
+      loop_control:
+      label: "site={{ item }}"

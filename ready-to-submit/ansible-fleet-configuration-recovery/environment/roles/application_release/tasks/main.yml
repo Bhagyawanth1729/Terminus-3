@@ -1,0 +1,23 @@
+---
+- name: Load production secret data
+  include_vars:
+    file: "{{ fleet_secret_file }}"
+    name: loaded_secrets
+  no_log: true
+  when: inventory_hostname in groups['application_nodes']
+
+- name: Render application configuration
+  template:
+    src: application.yml.j2
+    dest: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/application.yml"
+    mode: '0640'
+  vars:
+    application_secret: "{{ fleet_vault.application.database_password }}"
+  notify: reload fleet services
+
+- name: Promote application configuration
+  copy:
+    src: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/application.yml"
+    dest: "{{ fleet_runtime_root }}/rootfs/{{ inventory_hostname }}/etc/fleet/application.yml"
+    remote_src: true
+    mode: '0640'

@@ -1,0 +1,44 @@
+---
+- name: Fleet preflight
+  hosts: all
+  gather_facts: false
+  any_errors_fatal: true
+  roles:
+    - fleet_preflight
+
+- name: Prepare fleet hosts
+  hosts: all
+  gather_facts: false
+  serial: 25%
+  roles:
+    - common_baseline
+    - service_identity
+    - application_release
+    - trust_bundle
+
+- name: Configure edge tier
+  hosts: proxy_nodes
+  gather_facts: false
+  serial: 1
+  roles:
+    - telemetry_agent
+    - edge_proxy_config
+
+- name: Configure telemetry tier
+  hosts: all
+  gather_facts: false
+  roles:
+    - edge_proxy
+
+- name: Apply host policy
+  hosts: all
+  gather_facts: false
+  roles:
+    - host_policy
+
+- name: Validate fleet convergence
+  hosts: all
+  gather_facts: false
+  serial: 25%
+  roles:
+    - fleet_validation

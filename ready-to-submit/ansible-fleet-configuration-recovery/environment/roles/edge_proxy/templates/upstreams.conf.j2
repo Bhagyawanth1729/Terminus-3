@@ -1,0 +1,16 @@
+upstream checkout_backend {
+{% set app_hosts = groups['application_nodes'] %}
+{% for host in app_hosts %}
+{% set endpoint = hostvars[host].fleet_services.checkout.endpoint %}
+    server {{ endpoint.host }}:{{ endpoint.port }} weight={{ endpoint.weight | default(1) }} max_fails={{ fleet_effective_settings.proxy.max_fails }} fail_timeout={{ fleet_effective_settings.proxy.fail_timeout_seconds }}s;
+{% endfor %}
+}
+
+server {
+    listen 8443 ssl;
+    location / {
+        proxy_connect_timeout {{ fleet_effective_settings.proxy.connect_timeout_seconds }}s;
+        proxy_read_timeout {{ fleet_effective_settings.proxy.read_timeout_seconds }}s;
+        proxy_pass http://checkout_backend;
+    }
+}

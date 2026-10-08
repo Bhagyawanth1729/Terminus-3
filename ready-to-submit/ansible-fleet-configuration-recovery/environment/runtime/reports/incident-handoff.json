@@ -1,0 +1,28 @@
+{
+  "incident_id": "FLEET-2026-0818-ANSIBLE",
+  "service": "fleet-automation",
+  "severity": "SEV-2",
+  "opened_at": "2026-08-18T03:11:42Z",
+  "status": "handoff",
+  "impact": {
+    "sites": ["blr", "maa", "hyd"],
+    "change_window_blocked": true,
+    "runtime_mutation_performed": false
+  },
+  "operator_observations": [
+    "project bootstrap command failed before a configuration file was produced",
+    "the playbook subsequently reported no active configuration and failed role discovery",
+    "later recovery attempts exposed independent parser, variable, secret-scope and template failures"
+  ],
+  "evidence": [
+    "runtime/logs/incident-bootstrap.log",
+    "runtime/logs/incident-playbook.log",
+    "runtime/evidence/config-selection.txt"
+  ],
+  "guardrails": [
+    "do not replace project roles with globally installed copies",
+    "do not commit plaintext production credentials as a workaround",
+    "do not bypass idempotent modules with shell commands solely to silence errors",
+    "preserve site-specific backend, trust and policy semantics"
+  ]
+}

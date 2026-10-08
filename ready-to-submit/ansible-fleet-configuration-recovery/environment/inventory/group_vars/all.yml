@@ -1,0 +1,62 @@
+fleet_site_defaults:
+  application:
+    service: checkout
+    listen:
+      address: 0.0.0.0
+      port: 8080
+    dependencies:
+      timeout_seconds: 3
+      retries: 2
+      tls:
+        enabled: true
+        trust_bundle: /etc/ssl/certs/fleet-ca-bundle.pem
+  proxy:
+    connect_timeout_seconds: 2
+    read_timeout_seconds: 15
+    max_fails: 3
+    fail_timeout_seconds: 10
+  telemetry:
+    scrape_interval: 15s
+    labels:
+      owner: platform
+      environment: prod
+  policy:
+    default_action: deny
+    management_cidrs:
+      - 10.40.0.0/16
+      - 10.50.0.0/16
+      - 10.60.0.0/16
+
+fleet_site_overrides:
+  blr:
+    application:
+      dependencies:
+        timeout_seconds: 2
+  maa:
+    application:
+      listen:
+        port: 8081
+  hyd:
+    application:
+      dependencies: 4
+
+fleet_certificates:
+  - name: corporate-root
+    priority: 10
+    pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIBCORPORATEROOTPLACEHOLDER
+      -----END CERTIFICATE-----
+  - name: service-intermediate
+    priority: 20
+    pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIBSERVICEINTERMEDIATEPLACEHOLDER
+      -----END CERTIFICATE-----
+
+fleet_secret_file: "{{ inventory_dir }}/group_vars/prod/vault.yml"
+fleet_required_groups:
+  - application_nodes
+  - proxy_nodes
+  - database_nodes
+  - telemetry_collectors

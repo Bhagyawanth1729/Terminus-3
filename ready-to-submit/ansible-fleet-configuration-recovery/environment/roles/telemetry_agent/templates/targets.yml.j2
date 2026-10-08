@@ -1,0 +1,8 @@
+targets:
+{% for host in groups['telemetry_collectors'] + groups['application_nodes'] + groups['proxy_nodes'] %}
+  - host: {{ hostvars[host].telemetry_address | default(hostvars[host].ansible_host) }}
+    port: {{ hostvars[host].telemetry_port | default(9100) }}
+    labels:
+      inventory_host: {{ host }}
+      site: {{ hostvars[host].group_names | intersect(['blr', 'maa', 'hyd']) | first }}
+{% endfor %}

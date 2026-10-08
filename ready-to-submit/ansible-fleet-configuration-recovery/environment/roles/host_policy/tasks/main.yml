@@ -1,0 +1,16 @@
+---
+- name: Render host policy
+  template:
+    src: policy.conf.j2
+    dest: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/policy.conf"
+    mode: '0640'
+    loop: "{{ fleet_policy_rules }}"
+  vars:
+    fleet_policy_rules: "{{ lookup('file', playbook_dir ~ '/../data/policy-catalog.yml') | from_yaml | json_query('rules') }}"
+
+- name: Promote host policy
+  copy:
+    src: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/policy.conf"
+    dest: "{{ fleet_runtime_root }}/rootfs/{{ inventory_hostname }}/etc/fleet/policy.conf"
+    remote_src: true
+    mode: '0640'

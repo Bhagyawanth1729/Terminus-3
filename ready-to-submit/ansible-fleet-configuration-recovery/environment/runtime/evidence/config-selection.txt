@@ -1,0 +1,21 @@
+$ pwd
+/app/fleet-automation
+
+$ ansible --version
+ansible 2.9.27
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/local/lib/python3.12/site-packages/ansible
+  executable location = /usr/local/bin/ansible
+
+$ ansible-config dump --only-changed
+
+$ ansible-config list | sed -n '/DEFAULT_ROLES_PATH/,+8p'
+DEFAULT_ROLES_PATH:
+  default: ['~/.ansible/roles', '/usr/share/ansible/roles', '/etc/ansible/roles']
+  description: Colon separated paths in which Ansible will search for Roles.
+  env:
+  - name: ANSIBLE_ROLES_PATH
+  ini:
+  - key: roles_path
+    section: defaults

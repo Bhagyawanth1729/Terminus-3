@@ -1,0 +1,20 @@
+---
+- name: Run fleet semantic validator
+  command: >-
+    python3 {{ playbook_dir }}/../lib/fleet_validator.py
+    --root {{ fleet_runtime_root }}
+    --output {{ fleet_runtime_root }}/reports/fleet-validation.json
+    {{ inventory_hostname }}
+  register: fleet_validation_result
+  changed_when: false
+  failed_when: fleet_validation_result.rc != 0
+
+- name: Read validation report
+  slurp:
+    src: "{{ fleet_runtime_root }}/reports/fleet-validation.json"
+  register: fleet_validation_report
+
+- name: Require clean host state
+  assert:
+    that:
+      - (fleet_validation_report.content | b64decode | from_json).ok

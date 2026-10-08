@@ -1,0 +1,3 @@
+{% for rule in fleet_policy_rules | sort(attribute='priority') %}
+priority {{ rule.priority }} source {{ rule.source }} destination {{ rule.destination }} protocol {{ rule.protocol }} port {{ rule.port }} action {{ rule.action }} id {{ rule.id }} owner {{ rule.owner }}
+{% endfor %}

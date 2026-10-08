@@ -1,0 +1,15 @@
+---
+- name: Render telemetry targets
+  template:
+    src: targets.yml.j2
+    dest: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/targets.yml"
+    mode: '0640'
+  notify: restart telemetry agent
+
+- name: Promote telemetry targets
+  copy:
+    src: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/targets.yml"
+    dest: "{{ fleet_runtime_root }}/rootfs/{{ inventory_hostname }}/etc/telemetry/targets.yml"
+    remote_src: true
+    mode: '0640'
+    directory_mode: '0640'

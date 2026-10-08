@@ -1,0 +1,12 @@
+---
+- name: reload fleet services
+  debug:
+    msg: "reload fleet services for {{ inventory_hostname }}"
+
+- name: reload edge proxy
+  debug:
+    msg: "reload edge proxy for {{ inventory_hostname }}"
+
+- name: restart telemetry agent
+  debug:
+    msg: "restart telemetry agent for {{ inventory_hostname }}"

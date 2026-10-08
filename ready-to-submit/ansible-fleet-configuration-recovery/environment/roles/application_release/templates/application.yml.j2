@@ -1,0 +1,16 @@
+environment: {{ fleet_environment }}
+site: {{ fleet_site }}
+service: {{ fleet_effective_settings.application.service }}
+listen:
+  address: {{ fleet_effective_settings.application.listen.address }}
+  port: {{ fleet_effective_settings.application.listen.port }}
+dependencies:
+  timeout_seconds: {{ fleet_effective_settings.application.dependencies.timeout_seconds }}
+  retries: {{ fleet_effective_settings.application.dependencies.retries }}
+  tls:
+    enabled: {{ fleet_effective_settings.application.dependencies.tls.enabled | bool | lower }}
+    trust_bundle: {{ fleet_effective_settings.application.dependencies.tls.trust_bundle }}
+credentials:
+  database_password: {{ application_secret }}
+identity:
+  path: {{ fleet_identity_path }}

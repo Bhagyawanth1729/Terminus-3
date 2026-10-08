@@ -1,0 +1,29 @@
+2026-08-18T03:27:10Z fleet-automation operator=platform-oncall run=site-recovery-attempt-2
+PLAY [Fleet preflight] *********************************************************
+TASK [fleet_preflight : Confirm required variable roots exist] ****************
+ok: [blr-app-01]
+ok: [maa-app-01]
+ok: [hyd-app-01]
+
+PLAY [Prepare fleet hosts] *****************************************************
+ERROR! conflicting action statements: copy, file
+
+The error appears to be in '/app/fleet-automation/roles/common_baseline/tasks/main.yml': line 22, column 3.
+
+2026-08-18T03:39:58Z fleet-automation operator=platform-oncall run=site-recovery-attempt-3
+ERROR! the role 'edge_proxy_config' was not found in /app/fleet-automation/roles:/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
+
+2026-08-18T04:02:21Z fleet-automation operator=platform-oncall run=site-recovery-attempt-4
+fatal: [hyd-app-01]: FAILED! => {"msg": "The task includes an option with an undefined variable. The error was: 'int object' has no attribute 'timeout_seconds'"}
+
+2026-08-18T04:16:05Z fleet-automation operator=platform-oncall run=site-recovery-attempt-5
+fatal: [blr-app-01]: FAILED! => {"msg": "The task includes an option with an undefined variable. The error was: 'fleet_vault' is undefined"}
+
+2026-08-18T04:33:40Z fleet-automation operator=platform-oncall run=site-recovery-attempt-6
+fatal: [blr-proxy-01]: FAILED! => {"msg": "AnsibleUndefinedVariable: 'str object' has no attribute 'endpoint'"}
+
+2026-08-18T04:51:14Z fleet-automation operator=platform-oncall run=site-recovery-attempt-7
+fatal: [blr-app-01]: FAILED! => {"msg": "'dict object' has no attribute 'telemetry_collectors'"}
+
+2026-08-18T05:07:55Z fleet-automation operator=platform-oncall run=site-recovery-attempt-8
+fatal: [blr-app-01]: FAILED! => {"changed": false, "msg": "Unsupported parameters for (copy) module: directory_mode"}

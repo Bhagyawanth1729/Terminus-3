@@ -1,0 +1,28 @@
+version = "2.0"
+name = "ansible-fleet-configuration-recovery"
+category = "Software"
+subcategory = "Infrastructure Automation"
+tags = ["ansible", "jinja", "linux", "operations", "configuration-management"]
+languages = ["yaml", "python", "jinja2", "bash"]
+difficulty = "advanced"
+expert_time_estimate_hours = 10
+artifacts = ["/app/fleet-automation"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+
+[verifier]
+timeout_sec = 1800
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 7200
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 1200
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+workdir = "/app/fleet-automation"

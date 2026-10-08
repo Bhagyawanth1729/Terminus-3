@@ -1,0 +1,14 @@
+---
+- name: Render edge proxy configuration
+  template:
+    src: upstreams.conf.j2
+    dest: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/fleet.conf"
+    mode: '0644'
+  notify: reload edge proxy
+
+- name: Promote edge proxy configuration
+  copy:
+    src: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/fleet.conf"
+    dest: "{{ fleet_runtime_root }}/rootfs/{{ inventory_hostname }}/etc/nginx/conf.d/fleet.conf"
+    remote_src: true
+    mode: '0644'

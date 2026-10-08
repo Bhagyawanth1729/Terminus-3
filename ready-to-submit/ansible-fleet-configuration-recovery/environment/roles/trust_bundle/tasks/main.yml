@@ -1,0 +1,17 @@
+---
+- name: Render trust bundle into staging
+  copy:
+    dest: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/fleet-ca-bundle.pem"
+    content: |
+      {% for cert in fleet_certificates | sort(attribute='priority') %}
+      {{ cert.pem | trim }}
+      {% endfor %}
+    mode: '0644'
+  notify: reload fleet services
+
+- name: Promote trust bundle
+  copy:
+    src: "{{ fleet_runtime_root }}/staged/{{ inventory_hostname }}/fleet-ca-bundle.pem"
+    dest: "{{ fleet_runtime_root }}/rootfs/{{ inventory_hostname }}/etc/ssl/certs/fleet-ca-bundle.pem"
+    remote_src: true
+    mode: '0644'
