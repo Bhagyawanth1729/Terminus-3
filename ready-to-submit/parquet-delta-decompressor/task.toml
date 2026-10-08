@@ -1,0 +1,55 @@
+name = "parquet-delta-decompressor"
+
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Software"
+subcategory = "Databases"
+tags = ["rust", "python", "parquet", "ffi", "simd", "ctypes", "databases", "decompression"]
+languages = ["rust", "python"]
+difficulty = "advanced"
+expert_time_estimate_hours = 6
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-language telemetry decompression stack across Rust C-FFI native libraries and Python PyArrow/ctypes. \
+The Rust dynamic library (libdeltaparquet.so) contains two core bugs: 1) SIMD bit-unpacking in decoder.rs zero-extends packed integer deltas instead of sign-extending signed negative deltas, causing corrupted timestamps on out-of-order events; 2) dictionary.rs assumes fixed 32-bit offset headers for dictionary pages instead of parsing varint byte lengths, corrupting dictionary string mappings when entry count exceeds 127. \
+Additionally, the Python ctypes wrapper in delta_decoder.py declares buffer sizes as 32-bit c_int instead of 64-bit c_size_t/c_uint64, truncating large payload buffers. \
+Partial fixes (e.g. fixing Python ctypes without repairing Rust sign extension or varint offset decoding) fail verification when evaluated against edge-case negative delta streams and multi-page dictionary data.\
+"""
+
+solution_explanation = """\
+1. In `environment/app/native_delta/src/decoder.rs`, update `unpack_delta` to perform proper sign extension based on bit width (8/16/32-bit signed casting) rather than zero-extending raw bits as positive u64. \
+2. In `environment/app/native_delta/src/dictionary.rs`, replace fixed 4-byte header offset logic with varint decoding (LEB128) to determine the exact start of dictionary string data. \
+3. In `environment/app/src/delta_decoder.py`, update ctypes function parameter `argtypes` for `decode_delta_stream` to use `ctypes.c_uint64` instead of `ctypes.c_int32` for all byte length parameters. \
+4. Execute `/app/build.sh` to recompile `libdeltaparquet.so` via Cargo, then run `/app/src/query_pipeline.py --data /app/data/telemetry.parquet --out /app/out/report.json`.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate isolated container and checks the pipeline against three independent axes: \
+1) Exact JSON schema and numerical aggregates in /app/out/report.json generated from the primary dataset; \
+2) Re-running query_pipeline.py against held-out Parquet datasets (/tests/holdout/edge_telemetry.parquet) containing negative deltas and multi-page varint dictionary layouts to ensure true generalization; \
+3) Determinism and buffer integrity checks to ensure zero Rust panics or memory segfaults across multi-page lookups.\
+"""
+
+relevant_experience = """\
+Author has extensive experience authoring high-throughput storage engines, columnar Parquet page formats, SIMD bit packing algorithms, and cross-language Rust/Python CFFI interfaces.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 600
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

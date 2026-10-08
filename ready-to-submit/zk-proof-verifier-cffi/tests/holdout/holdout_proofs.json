@@ -1,0 +1,12 @@
+[
+  {
+    "id": "holdout_user_201",
+    "public_scalar": "ab2504d64d2b70a300bbe87346be203050ef3a5a20893784fa0376f320039c4c",
+    "proof_hex": "d7c55190f00b7e9226fe2f9ea09f6be66abb34e45de06d4a5d46fca997e0e606"
+  },
+  {
+    "id": "holdout_user_202",
+    "public_scalar": "4723bf89267b442acf8639ff712f69398af205442553f6d7191a373f88fd5da3",
+    "proof_hex": "34cb68679f407261bb0f884a50e6188b2c9fbd43a378a1a9260709ca0d7b3c9b"
+  }
+]

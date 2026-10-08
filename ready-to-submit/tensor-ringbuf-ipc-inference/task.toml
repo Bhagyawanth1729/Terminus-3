@@ -1,0 +1,56 @@
+version = "2.0"
+name = "tensor-ringbuf-ipc-inference"
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "ML"
+subcategory = "Inference"
+tags = ["rust", "go", "python", "shared-memory", "ipc", "ring-buffer", "quantization", "avx512", "concurrency"]
+languages = ["rust", "python", "go"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+
+difficulty_explanation = """\
+Agents must diagnose and repair an IPC tensor inference pipeline spanning Go (HTTP/gRPC ingress), Rust (AVX-512 SIMD quantized kernel engine via C-FFI), and Python (dynamic batch controller). \
+Under concurrent load, three interacting defects cause catastrophic failures: \
+1) Go ring-buffer writer calculates payload buffer offsets without 64-byte SIMD cache-line alignment, triggering SIGBUS / unaligned memory access in Rust SIMD load instructions; \
+2) Go serializes int8 quantization scale factors in big-endian byte order while Rust expects little-endian IEEE-754 floats, causing silent logit corruption; \
+3) Python dynamic batch manager fails to advance the atomic tail pointer upon client connection drop / timeout, causing permanent lockless ring-buffer stalls.\
+"""
+
+solution_explanation = """\
+1. In Go (`go-ingress/ringbuf.go`), align tensor payload offset calculations to 64-byte boundaries using `((offset + 63) & ^63)` and fix scale factor encoding to little-endian (`binary.LittleEndian.PutUint32`). \
+2. In Python (`python-orchestrator/batcher.py`), update the request cleanup routine to atomically advance the shared ring buffer header tail pointer when discarding timed-out requests. \
+3. In Rust (`rust-engine/src/lib.rs`), ensure SIMD buffer pointers assert 64-byte alignment and safely handle quantized int8-to-float32 scaling without thread desynchronization. \
+4. Rebuild all components using `/app/build_all.sh`.\
+"""
+
+verification_explanation = """\
+The verifier runs in an isolated container and validates the repaired pipeline across three independent criteria: \
+1) Logit numerical accuracy: verifies exact float32 logit outputs against golden reference vectors across multiple quantized test batches; \
+2) 64-byte SIMD memory alignment under variable tensor payload sizes (preventing SIGBUS); \
+3) Lockless ring-buffer resilience: simulates 50 rapid client cancellations and verifies zero ring-buffer deadlocks or dropped worker threads.\
+"""
+
+relevant_experience = """\
+Author has extensive experience designing low-latency ML inference engines, POSIX shared-memory IPC architectures, and cross-language zero-copy FFI runtimes.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

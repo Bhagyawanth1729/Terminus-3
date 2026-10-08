@@ -1,0 +1,55 @@
+name = "lsm-wal-cgo-compactor"
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Software"
+subcategory = "Databases"
+tags = ["rust", "go", "python", "lsm-tree", "wal", "cgo", "c-ffi", "crc32c", "ipc", "databases"]
+languages = ["go", "rust", "python"]
+difficulty = "advanced"
+expert_time_estimate_hours = 6
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-language time-series LSM database engine (Go Raft WAL manager -> Rust C-FFI SSTable block compactor -> Python IPC transactional validator daemon). \
+When Go passes WAL record slices to Rust via C-FFI, it passes unaligned byte pointer boundaries and computes block footers using IEEE CRC32c polynomial instead of Castagnoli CRC32c, causing SIMD misaligned reads and checksum validation failures. \
+In the Rust compactor engine, atomic write cursor stores use Ordering::Relaxed instead of Release ordering, corrupting block footer commitments under multi-threaded loads, and write error panics leave shared SSTable registry mutexes poisoned without recovery logic. \
+Additionally, the Python IPC client reads domain socket payload frames using 4-byte big-endian integers while Go/Rust emits varint encoded frame lengths, corrupting variable-length string metrics in /app/output.json. \
+Partial fixes (e.g. fixing Python socket framing without repairing Go C-FFI memory alignment or Rust atomic release ordering) still fail holdout stress and concurrency tests.\
+"""
+
+solution_explanation = """\
+1. In Go (/app/go_wal/compactor_cgo.go & /app/go_wal/crc.go), enforce 8-byte buffer alignment before invoking cgo_compact_wal, and switch the CRC32c polynomial from IEEE (0xEDB88320) to Castagnoli (0x82F63B78). \
+2. In Rust (/app/rust_compactor/src/lib.rs & /app/rust_compactor/src/sstable.rs), change dirty page write cursor stores from Ordering::Relaxed to Ordering::Release, and add lock poisoning recovery (poisoned.into_inner()) when acquiring shared SSTable mutexes. \
+3. In Python (/app/python_validator/client.py), update socket message frame decoding to parse protobuf-style unsigned varint length prefixes instead of 4-byte big-endian integers. \
+4. Rebuild the system via /app/build_all.sh and execute the pipeline to generate /app/output.json.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate container and tests the rebuilt system against three independent axes of failure: \
+1) Exact time-series aggregation, host record counts, and Castagnoli CRC32c checksum validity in /app/output.json; \
+2) Re-running the rebuilt pipeline on unseen holdout WAL files in /tests/holdout/wal/ via unprivileged sandbox execution; \
+3) Multi-threaded WAL replay and concurrency stress testing to verify atomic release ordering and lock poisoning recovery.\
+"""
+
+relevant_experience = """\
+Author has extensive experience building distributed database storage engines, cross-language C-FFI bindings (Go cgo / Rust FFI), high-performance WAL log compactors, and IPC binary wire protocols.\
+"""
+
+[verifier]
+timeout_sec = 900
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

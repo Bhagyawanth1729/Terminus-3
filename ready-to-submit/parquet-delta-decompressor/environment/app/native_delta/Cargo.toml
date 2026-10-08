@@ -1,0 +1,10 @@
+[package]
+name = "native_delta"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "deltaparquet"
+crate-type = ["cdylib"]
+
+[dependencies]

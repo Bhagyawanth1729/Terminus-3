@@ -1,0 +1,3 @@
+The multi-language time-series LSM database engine in `/app` is experiencing compaction failures, corrupted SSTable checksums, and IPC benchmark query errors. The system consists of a Go Write-Ahead Logging (WAL) manager (`/app/go_wal`), a Rust C-FFI block compaction engine (`/app/rust_compactor`), and a Python IPC benchmark validator (`/app/python_validator`).
+
+Investigate the cross-language storage and IPC pipeline to resolve all underlying memory alignment, atomic store ordering, CRC calculation, lock recovery, and socket framing defects. Rebuild the system binaries using `/app/build_all.sh` and execute the pipeline so that valid SSTable files are generated under `/app/sst/` and the complete metrics benchmark summary is written to `/app/output.json`.
