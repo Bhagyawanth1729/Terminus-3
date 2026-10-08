@@ -1,0 +1,5 @@
+# State format
+
+`cache/<key>.json` stores scan evidence, `audit.jsonl` stores durable decision records, `last-decision.json` is a derived projection, and `replay/consumed.jsonl` records permit consumption. Cache evidence is usable only for the same immutable artifact digest, policy version, scanner DB revision, and unexpired TTL.
+
+State transitions must be crash-safe and replay-safe. Repeating the same request against unchanged material request/policy inputs is an idempotent retry: it reuses the existing `decision_id` and does not append a second audit decision. The audit journal is authoritative; `last-decision.json` may advance only after its corresponding journal record is durable and must agree with the newest valid record. A complete final JSON record remains valid even when its trailing newline was not durable. A malformed JSON audit record is durable corruption: a new operation must fail closed with the normal operational-failure exit behavior and must not silently truncate or extend corrupted history.

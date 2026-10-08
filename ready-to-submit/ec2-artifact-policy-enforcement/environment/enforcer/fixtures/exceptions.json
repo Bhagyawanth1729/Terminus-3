@@ -1,0 +1,7 @@
+{
+  "exceptions": [
+    {"id": "SEC-100", "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222", "surfaces": ["package"], "environments": ["staging"], "policy_codes": ["VULNERABILITY_THRESHOLD"], "expires_at": "2026-08-20T00:00:00Z"},
+    {"id": "SEC-200", "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666", "surfaces": ["dependency"], "environments": ["production"], "policy_codes": ["VULNERABILITY_THRESHOLD"], "expires_at": "2026-08-10T00:00:00Z"},
+    {"id": "SEC-300", "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444", "surfaces": ["container"], "environments": ["staging"], "policy_codes": ["VULNERABILITY_THRESHOLD"], "expires_at": "2026-08-20T00:00:00Z"}
+  ]
+}

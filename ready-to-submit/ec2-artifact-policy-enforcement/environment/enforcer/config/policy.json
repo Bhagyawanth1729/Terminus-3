@@ -1,0 +1,13 @@
+{
+  "version": "policy-2026-08-17-a",
+  "scanner_db_revision": "trivy-db-2026-08-17",
+  "deny_severities": ["CRITICAL", "HIGH"],
+  "trusted_sources": {
+    "package": ["ubuntu-main", "amazonlinux-base"],
+    "container": ["public.ecr.aws", "123456789012.dkr.ecr.us-east-1.amazonaws.com"],
+    "dependency": ["pypi.org", "repo.maven.apache.org", "registry.npmjs.org"]
+  },
+  "require_digest": {"package": true, "container": true, "dependency": true},
+  "cache_ttl_seconds": 3600,
+  "permit_ttl_seconds": 300
+}

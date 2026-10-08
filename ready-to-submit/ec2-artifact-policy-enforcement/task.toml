@@ -1,0 +1,32 @@
+version = "2.0"
+name = "ec2-artifact-policy-enforcement"
+category = "Software"
+subcategory = "Systems"
+tags = ["aws", "ec2", "policy-as-code", "supply-chain", "vulnerability", "security"]
+languages = ["go", "bash", "json"]
+difficulty = "advanced"
+expert_time_estimate_hours = 12
+artifacts = ["/app/enforcer"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+difficulty_explanation = "The inherited EC2 software gate has one decision path for packages, images, and build dependencies, but alternate installers bypass source policy, scanner outages fail open, mutable image tags reuse stale clean scans, exceptions ignore scope/expiry, cache identity omits policy and vulnerability-DB revisions, permits are forgeable, and denied actions disappear from audit history."
+solution_explanation = "Enforce source and digest policy on every acquisition surface, fail closed without current scanner evidence, key durable scan cache by immutable digest plus policy/DB revision and TTL, scope exceptions by digest/surface/environment/policy/expiry, HMAC-sign instance-bound permits, and durably journal both allows and denies."
+verification_explanation = "The verifier rebuilds the submitted Go service and drives package, container, and dependency requests through clean, vulnerable, unavailable-scanner, direct-install, mutable-tag, cache-invalidation, exception, permit-tamper, restart-cache, and audit-durability scenarios."
+relevant_experience = "EC2 host controls, package managers, container registries, dependency proxies, vulnerability scanning, policy-as-code, cache invalidation, HMAC authorization, and security audit design."
+
+[verifier]
+timeout_sec = 1800
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 10800
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 1800
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+workdir = "/app/enforcer"
