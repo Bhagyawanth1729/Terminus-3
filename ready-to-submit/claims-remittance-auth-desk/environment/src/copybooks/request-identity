@@ -1,0 +1,29 @@
+           MOVE 0 TO H-COUNT
+           MOVE SPACES TO H-STORED-FINGERPRINT H-STORED-RESPONSE
+           EXEC SQL
+        SELECT COUNT(*) INTO :H-COUNT
+          FROM request_record
+         WHERE request_id = :H-REQUEST
+           END-EXEC
+           IF SQLCODE NOT = 0
+        SET SQL-FAILED TO TRUE
+        EXIT PARAGRAPH
+           END-IF.
+           IF H-COUNT > 0
+        EXEC SQL
+            SELECT command_name, response_line
+              INTO :H-STORED-FINGERPRINT, :H-STORED-RESPONSE
+              FROM request_record
+             WHERE request_id = :H-REQUEST
+        END-EXEC
+        IF SQLCODE NOT = 0
+            SET SQL-FAILED TO TRUE
+            EXIT PARAGRAPH
+        END-IF
+        IF FUNCTION TRIM(H-STORED-FINGERPRINT)
+             = FUNCTION TRIM(H-COMMAND)
+            SET REQUEST-REPLAYED TO TRUE
+        ELSE
+            PERFORM SET-REQUEST-CONFLICT
+        END-IF
+           END-IF.

@@ -1,0 +1,7 @@
+           EXEC SQL
+        SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+           END-EXEC
+           IF SQLCODE NOT = 0
+        SET SQL-FAILED TO TRUE
+        EXIT PARAGRAPH
+           END-IF.

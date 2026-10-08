@@ -1,0 +1,30 @@
+version = "2.0"
+name = "claims-remittance-auth-desk"
+category = "Operations"
+subcategory = "Claims"
+tags = ["cobol", "postgresql", "remittance", "benefits"]
+languages = ["cobol", "sql", "bash"]
+difficulty = "advanced"
+expert_time_estimate_hours = 12
+artifacts = ["/app/claims"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+custom_docker_compose = true
+is_multi_container = true
+
+[verifier]
+timeout_sec = 2400
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 9000
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 2400
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app/claims"

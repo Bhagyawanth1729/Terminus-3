@@ -1,0 +1,59 @@
+           COMPUTE H-NEW-PLAN = H-PLAN-PAID - H-CLAW-CENTS
+           EXEC SQL
+        UPDATE claim
+           SET plan_paid = :H-NEW-PLAN,
+               revision = revision + 1
+         WHERE claim_id = :H-CLAIM
+           END-EXEC
+           IF SQLCODE NOT = 0
+        SET SQL-FAILED TO TRUE
+        EXIT PARAGRAPH
+           END-IF
+           MOVE 0 TO H-COUNT
+           EXEC SQL
+        SELECT COUNT(*) INTO :H-COUNT
+          FROM remittance
+         WHERE remittance_id = :H-REMITTANCE
+           AND claim_id = :H-CLAIM
+           END-EXEC
+           IF SQLCODE NOT = 0
+        SET SQL-FAILED TO TRUE
+        EXIT PARAGRAPH
+           END-IF
+           IF H-COUNT = 0
+        PERFORM SET-UNKNOWN-REMITTANCE
+        EXIT PARAGRAPH
+           END-IF
+           EXEC SQL
+        SELECT plan_cents, clawed_cents
+          INTO :H-REM-PLAN, :H-REM-CLAWED
+          FROM remittance
+         WHERE remittance_id = :H-REMITTANCE
+           AND claim_id = :H-CLAIM
+           FOR UPDATE
+           END-EXEC
+           IF SQLCODE NOT = 0
+        SET SQL-FAILED TO TRUE
+        EXIT PARAGRAPH
+           END-IF
+           COMPUTE H-CLAWABLE = H-REM-PLAN - H-REM-CLAWED
+           IF H-CLAW-CENTS > H-CLAWABLE
+        PERFORM SET-EXCEEDS-CLAWBACK
+        EXIT PARAGRAPH
+           END-IF
+           COMPUTE H-NEW-CLAWED = H-REM-CLAWED + H-CLAW-CENTS
+           EXEC SQL
+        UPDATE remittance
+           SET clawed_cents = :H-NEW-CLAWED
+         WHERE remittance_id = :H-REMITTANCE
+           END-EXEC
+           IF SQLCODE NOT = 0
+        SET SQL-FAILED TO TRUE
+        EXIT PARAGRAPH
+           END-IF
+           COMPUTE H-NEW-REVISION = H-CURRENT-REVISION + 1
+           MOVE H-STATE TO WS-PRIOR-STATE WS-NEW-STATE
+           MOVE H-REMITTANCE TO WS-REMITTANCE-OUT
+           MOVE H-PATIENT-PAID TO H-NEW-PATIENT
+           MOVE H-NEW-PLAN TO H-DISPLAY-PLAN
+           MOVE H-PATIENT-PAID TO H-DISPLAY-PATIENT.

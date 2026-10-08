@@ -1,0 +1,28 @@
+services:
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      CLAIMS_DB: claims@database:5432
+      CLAIMS_DB_USER: claims_app
+      CLAIMS_DB_PASSWORD: claims_local
+    command: ["sleep", "infinity"]
+
+  database:
+    build:
+      context: ./db
+    environment:
+      POSTGRES_DB: claims
+      POSTGRES_USER: claims_app
+      POSTGRES_PASSWORD: claims_local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claims_app -d claims"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    tmpfs:
+      - /var/lib/postgresql/data

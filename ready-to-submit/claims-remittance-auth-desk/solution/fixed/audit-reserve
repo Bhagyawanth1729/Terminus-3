@@ -1,0 +1,21 @@
+           IF NOT BUSINESS-FAILED
+        EXEC SQL
+            SELECT next_value INTO :H-AUDIT-SEQUENCE
+              FROM audit_counter
+             WHERE singleton = true
+               FOR UPDATE
+        END-EXEC
+        IF SQLCODE NOT = 0
+            SET SQL-FAILED TO TRUE
+            EXIT PARAGRAPH
+        END-IF
+        EXEC SQL
+            UPDATE audit_counter
+               SET next_value = next_value + 1
+             WHERE singleton = true
+        END-EXEC
+        IF SQLCODE NOT = 0
+            SET SQL-FAILED TO TRUE
+            EXIT PARAGRAPH
+        END-IF
+           END-IF.
