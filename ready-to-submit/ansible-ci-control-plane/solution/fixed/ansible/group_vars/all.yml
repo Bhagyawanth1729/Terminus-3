@@ -1,0 +1,27 @@
+---
+# Site settings for the CI control plane.
+ci_server_bind_host: "127.0.0.1"
+ci_server_port: 8080
+
+# Credentials issued by the platform team for this box.
+ci_api_token: "cdt-api-3f9a71c4"
+ci_webhook_token: "cdt-hook-b2d80e55"
+
+ci_server_agent_ttl_seconds: 45
+ci_server_default_page_size: 5
+ci_server_max_page_size: 50
+ci_server_build_retention: 3
+ci_server_log_chunk_max_bytes: 4096
+ci_server_claim_lease_seconds: 120
+ci_server_max_log_chunks: 100
+ci_server_build_timeout_seconds: 600
+ci_server_default_max_concurrent: 2
+ci_server_version: "3.1.0"
+
+# Bootstrap pipeline used by the post-deployment smoke sequence.
+ci_server_bootstrap_pipeline: "checkout-service"
+ci_server_bootstrap_repo: "git@vcs.internal:platform/checkout-service.git"
+ci_server_bootstrap_branch: "main"
+ci_server_bootstrap_runner: "bootstrap-runner"
+ci_server_bootstrap_artifact: "logs/bootstrap.txt"
+ci_server_bootstrap_artifact_sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"

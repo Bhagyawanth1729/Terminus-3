@@ -1,0 +1,19 @@
+---
+ci_server_user: "ciserver"
+ci_server_group: "ciserver"
+
+ci_server_prefix: "/app/var/ci-server"
+ci_server_bin_dir: "{{ ci_server_prefix }}/bin"
+ci_server_etc_dir: "{{ ci_server_prefix }}/etc"
+ci_server_state_dir: "{{ ci_server_prefix }}/state"
+ci_server_log_dir: "{{ ci_server_prefix }}/logs"
+ci_server_supervisor_dir: "{{ ci_server_etc_dir }}/supervisor"
+
+ci_server_source_dir: "/app/environment/ci-server"
+ci_server_binary: "{{ ci_server_bin_dir }}/ci-server"
+ci_server_config_file: "{{ ci_server_etc_dir }}/ci-server.json"
+ci_server_program_file: "{{ ci_server_supervisor_dir }}/ci-server.conf"
+ci_server_report_file: "{{ ci_server_state_dir }}/deploy-report.json"
+
+ci_server_supervisord_config: "/etc/supervisor/supervisord.conf"
+ci_server_base_url: "http://{{ ci_server_bind_host }}:{{ ci_server_port }}"

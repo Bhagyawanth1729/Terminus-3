@@ -1,0 +1,7 @@
+---
+- name: Restart ciserver
+  ansible.builtin.command:
+    cmd: "supervisorctl -c {{ ci_server_supervisord_config }} restart ci-server"
+  register: ci_server_restart
+  changed_when: true
+  failed_when: false

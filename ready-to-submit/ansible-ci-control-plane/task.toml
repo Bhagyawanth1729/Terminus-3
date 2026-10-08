@@ -1,0 +1,28 @@
+version = "2.0"
+name = "ansible-ci-control-plane"
+category = "Software"
+subcategory = "Systems"
+tags = ["ansible", "golang", "ci-control-plane", "supervisord"]
+languages = ["go", "yaml", "bash"]
+difficulty = "advanced"
+expert_time_estimate_hours = 8
+artifacts = ["/app/var/ci-server"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+
+[verifier]
+timeout_sec = 1800
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 5400
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 1800
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"

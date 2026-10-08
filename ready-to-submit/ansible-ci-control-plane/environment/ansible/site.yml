@@ -1,0 +1,7 @@
+---
+- name: Deploy the CI pipeline control plane
+  hosts: ciserver
+  gather_facts: false
+  become: false
+  roles:
+    - ci_server_deploy

@@ -1,0 +1,19 @@
+{
+  "status": "ok",
+  "version": "{{ ci_server_health.json.version }}",
+  "listen": "{{ ci_server_health.json.listen }}",
+  "digest": "{{ ci_server_health.json.digest }}",
+  "checks": {
+    "health": "{{ ci_server_health.json.status }}",
+    "pipeline": "{{ ci_server_pipeline.status }}",
+    "hook_build": "{{ ci_server_hook.json.build_id }}",
+    "claim_ok": "{{ ci_server_claim.json.claimer }}",
+    "log_ok": "{{ ci_server_log.json.n | default('1') }}",
+    "step_ok": "{{ ci_server_step.json.stage }}",
+    "transition": "{{ ci_server_claim.json.state }}",
+    "artifact": "{{ ci_server_artifact.json.filepath | default(ci_server_bootstrap_artifact) }}",
+    "runner": "{{ ci_server_agent.json.id }}",
+    "history_total": "{{ ci_server_history.json.total }}",
+    "stats_running": "{{ ci_server_stats.json.running }}"
+  }
+}

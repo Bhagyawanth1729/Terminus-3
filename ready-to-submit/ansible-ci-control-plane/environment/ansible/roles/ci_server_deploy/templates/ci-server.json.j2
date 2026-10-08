@@ -1,0 +1,17 @@
+{
+  "bind": "{{ ci_server_bind_host }}:{{ ci_server_port }}",
+  "data_dir": "{{ ci_server_state_dir }}",
+  "logs_dir": "{{ ci_server_log_dir }}",
+  "token": "{{ ci_api_token }}",
+  "hook_token": "{{ ci_webhook_token }}",
+  "ttl_seconds": {{ ci_server_agent_ttl_seconds }},
+  "page_size": {{ ci_server_default_page_size }},
+  "max_pages": {{ ci_server_max_page_size }},
+  "retain": {{ ci_server_build_retention }},
+  "chunk_limit": {{ ci_server_log_chunk_max_bytes }},
+  "lease_secs": {{ ci_server_claim_lease_seconds }},
+  "max_chunks": {{ ci_server_max_log_chunks }},
+  "timeout_secs": {{ ci_server_timeout_secs }},
+  "max_parallel": {{ ci_server_max_parallel }},
+  "release": "{{ ci_server_version }}"
+}

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Applies the CI server deployment onto this box.
+set -euo pipefail
+
+cd /app/environment/ansible
+export ANSIBLE_CONFIG=/app/environment/ansible/ansible.cfg
+exec ansible-playbook -i inventory.ini site.yml "$@"

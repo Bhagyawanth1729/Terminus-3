@@ -1,0 +1,126 @@
+---
+- name: Read the control-plane health endpoint
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/healthz"
+    method: GET
+    status_code: 200
+    return_content: true
+  register: ci_server_health
+
+- name: Register the bootstrap pipeline
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/pipelines"
+    method: POST
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    body_format: json
+    body:
+      name: "{{ ci_server_bootstrap_pipeline }}"
+      repo: "{{ ci_server_bootstrap_repo }}"
+      default_branch: "{{ ci_server_bootstrap_branch }}"
+    status_code: [201, 409]
+  register: ci_server_pipeline
+
+- name: Register the bootstrap runner heartbeat
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/agents/heartbeat"
+    method: POST
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    body_format: json
+    body:
+      agent_id: "{{ ci_server_bootstrap_runner }}"
+      capacity: 2
+    status_code: 200
+  register: ci_server_agent
+
+- name: Trigger a bootstrap build through the webhook entry point
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/hooks/{{ ci_server_bootstrap_pipeline }}"
+    method: POST
+    headers:
+      X-Ci-Server-Webhook-Token: "{{ ci_webhook_token }}"
+      Idempotency-Key: bootstrap-smoke
+    body_format: json
+    body:
+      branch: "{{ ci_server_bootstrap_branch }}"
+    status_code: 202
+  register: ci_server_hook
+
+- name: Claim the bootstrap build for the bootstrap runner
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/builds/{{ ci_server_hook.json.build_id }}/claim"
+    method: POST
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    body_format: json
+    body:
+      agent_id: "{{ ci_server_bootstrap_runner }}"
+    status_code: 200
+  register: ci_server_claim
+
+- name: Record a bootstrap build step
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/builds/{{ ci_server_hook.json.build_id }}/steps"
+    method: POST
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    body_format: json
+    body:
+      name: bootstrap
+      status: running
+    status_code: 201
+  register: ci_server_step
+
+- name: Append a bootstrap log chunk
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/builds/{{ ci_server_hook.json.build_id }}/logs"
+    method: POST
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    body_format: json
+    body:
+      seq: 1
+      text: "bootstrap smoke"
+    status_code: [201, 409]
+  register: ci_server_log
+
+- name: Record the bootstrap build log artifact
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/builds/{{ ci_server_hook.json.build_id }}/artifacts"
+    method: POST
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    body_format: json
+    body:
+      path: "{{ ci_server_bootstrap_artifact }}"
+      size_bytes: 2048
+      sha256: "{{ ci_server_bootstrap_artifact_sha256 }}"
+    status_code: [201, 409]
+  register: ci_server_artifact
+
+- name: Read the audit log total
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/audit?page=1"
+    method: GET
+    status_code: 200
+    return_content: true
+  register: ci_server_audit
+
+- name: Read the control-plane metrics
+  ansible.builtin.uri:
+    url: "{{ ci_server_base_url }}/v1/metrics"
+    method: GET
+    headers:
+      X-Ci-Server-Token: "{{ ci_api_token }}"
+    status_code: 200
+    return_content: true
+  register: ci_server_metrics
+
+- name: Publish the deployment report
+  ansible.builtin.template:
+    src: deploy-report.json.j2
+    dest: "{{ ci_server_report_file }}"
+    owner: "{{ ci_server_user }}"
+    group: "{{ ci_server_group }}"
+    mode: "0644"

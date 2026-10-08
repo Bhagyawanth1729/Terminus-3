@@ -1,0 +1,19 @@
+{
+  "status": "ok",
+  "version": "{{ ci_server_health.json.version }}",
+  "listen": "{{ ci_server_health.json.listen }}",
+  "config_digest": "{{ ci_server_health.json.config_digest }}",
+  "checks": {
+    "health": "{{ ci_server_health.json.status }}",
+    "pipeline_registered": "{{ ci_server_pipeline.status }}",
+    "webhook_build": "{{ ci_server_hook.json.build_id }}",
+    "build_claimed": "{{ ci_server_claim.json.claimed_by }}",
+    "log_appended": "{{ ci_server_log.json.seq | default('1') }}",
+    "step_recorded": "{{ ci_server_step.json.name }}",
+    "status_transition": "{{ ci_server_claim.json.status }}",
+    "artifact_recorded": "{{ ci_server_artifact.json.path | default(ci_server_bootstrap_artifact) }}",
+    "agent_registered": "{{ ci_server_agent.json.agent_id }}",
+    "audit_total": "{{ ci_server_audit.json.total }}",
+    "metrics_running": "{{ ci_server_metrics.json.running_builds }}"
+  }
+}

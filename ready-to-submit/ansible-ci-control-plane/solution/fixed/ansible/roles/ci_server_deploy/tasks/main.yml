@@ -1,0 +1,109 @@
+---
+- name: Ensure the ci-server service group exists
+  ansible.builtin.group:
+    name: "{{ ci_server_group }}"
+    system: true
+    state: present
+
+- name: Ensure the ci-server service account exists
+  ansible.builtin.user:
+    name: "{{ ci_server_user }}"
+    group: "{{ ci_server_group }}"
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    state: present
+
+- name: Ensure the deployment tree exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ci_server_user }}"
+    group: "{{ ci_server_group }}"
+    mode: "0775"
+  loop:
+    - "{{ ci_server_prefix }}"
+    - "{{ ci_server_bin_dir }}"
+    - "{{ ci_server_etc_dir }}"
+    - "{{ ci_server_supervisor_dir }}"
+    - "{{ ci_server_log_dir }}"
+    - "{{ ci_server_state_dir }}"
+    - "{{ ci_server_state_dir }}/pipelines"
+    - "{{ ci_server_state_dir }}/builds"
+    - "{{ ci_server_state_dir }}/artifacts"
+    - "{{ ci_server_state_dir }}/agents"
+    - "{{ ci_server_state_dir }}/logs"
+    - "{{ ci_server_state_dir }}/steps"
+    - "{{ ci_server_state_dir }}/audit"
+    - "{{ ci_server_state_dir }}/idempotency"
+
+- name: Compile the control-plane binary from source
+  ansible.builtin.command:
+    cmd: "go build -trimpath -o {{ ci_server_binary }} ./cmd/ci-server"
+    chdir: "{{ ci_server_source_dir }}"
+  environment:
+    CGO_ENABLED: "0"
+    GOCACHE: "/tmp/ci-server-gocache"
+    HOME: "/root"
+  changed_when: true
+  notify: Restart ci-server
+
+- name: Set ownership and mode on the installed binary
+  ansible.builtin.file:
+    path: "{{ ci_server_binary }}"
+    owner: root
+    group: "{{ ci_server_group }}"
+    mode: "0755"
+
+- name: Render the control-plane configuration
+  ansible.builtin.template:
+    src: ci-server.json.j2
+    dest: "{{ ci_server_config_file }}"
+    owner: root
+    group: "{{ ci_server_group }}"
+    mode: "0640"
+  notify: Restart ci-server
+
+- name: Install the supervisor program definition
+  ansible.builtin.template:
+    src: ci-server.conf.j2
+    dest: "{{ ci_server_program_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ci-server
+
+- name: Ensure supervisord is running
+  ansible.builtin.shell: |
+    set -e
+    if ! pgrep -x supervisord >/dev/null 2>&1; then
+      supervisord -c {{ ci_server_supervisord_config }}
+      sleep 2
+    fi
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: Reload the supervisor program definitions
+  ansible.builtin.command:
+    cmd: "supervisorctl -c {{ ci_server_supervisord_config }} update"
+  changed_when: false
+
+- name: Apply pending restarts before probing the control plane
+  ansible.builtin.meta: flush_handlers
+
+- name: Make sure the control-plane program is started
+  ansible.builtin.command:
+    cmd: "supervisorctl -c {{ ci_server_supervisord_config }} start ci-server"
+  register: ci_server_start
+  changed_when: "'started' in ci_server_start.stdout"
+  failed_when: false
+
+- name: Wait for the control plane to accept connections
+  ansible.builtin.wait_for:
+    host: "{{ ci_server_bind_host }}"
+    port: "{{ ci_server_port }}"
+    timeout: 45
+
+- name: Run the post-deployment smoke sequence
+  ansible.builtin.include_tasks: smoke.yml

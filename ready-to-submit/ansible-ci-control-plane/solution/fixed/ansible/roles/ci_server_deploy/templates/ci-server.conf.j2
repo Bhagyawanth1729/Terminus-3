@@ -1,0 +1,11 @@
+[program:ci-server]
+command={{ ci_server_binary }} -config {{ ci_server_config_file }}
+directory={{ ci_server_prefix }}
+user={{ ci_server_user }}
+autostart=true
+autorestart=true
+startsecs=3
+startretries=3
+stopsignal=TERM
+stdout_logfile={{ ci_server_log_dir }}/ci-server.out.log
+stderr_logfile={{ ci_server_log_dir }}/ci-server.err.log
