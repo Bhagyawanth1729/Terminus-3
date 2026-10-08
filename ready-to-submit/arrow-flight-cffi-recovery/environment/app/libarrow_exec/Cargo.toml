@@ -1,0 +1,12 @@
+[package]
+name = "libarrow_exec"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+tokio = { version = "1.35", features = ["full"] }
+lazy_static = "1.4"
+libc = "0.2"

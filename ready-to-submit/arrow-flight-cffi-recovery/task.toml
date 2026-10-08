@@ -1,0 +1,61 @@
+version = "2.0"
+name = "arrow-flight-cffi-recovery"
+category = "Software"
+subcategory = "Systems"
+tags = ["rust", "go", "python", "arrow-flight", "ffi", "tokio", "gRPC", "concurrency", "systems"]
+languages = ["rust", "go", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+artifacts = ["/app/"]
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous@example.com"
+category = "Software"
+subcategory = "Systems"
+tags = ["rust", "go", "python", "arrow-flight", "ffi", "tokio", "gRPC", "concurrency", "systems"]
+languages = ["rust", "go", "python"]
+difficulty = "frontier"
+expert_time_estimate_hours = 8
+
+difficulty_explanation = """\
+Agents must diagnose and repair a multi-tiered 3-language microservice stack (Python gRPC client -> Go Arrow Flight server -> Rust Tokio C-FFI query engine). \
+When client queries are cancelled, Go drops the gRPC stream context but fails to notify the underlying Rust engine via C-FFI handles, causing Tokio worker thread pool leaks, lock poisoning on shared C-FFI mutexes, and server stalling on subsequent queries. \
+Additionally, Go-to-Python Arrow schema conversion degrades fixed 128-bit decimal types to lossy float representations. \
+Partial fixes (e.g. fixing Go schema conversion without implementing thread-safe C-FFI context cancellation and lock poisoning recovery in Rust) still fail holdout stress tests.\
+"""
+
+solution_explanation = """\
+1. In Go (`flight-server/main.go`), trap `ctx.Done()` in the Arrow Flight stream handler and invoke `arrow_exec_cancel(handle)` on the C-FFI execution handle. \
+2. In Go, update the Arrow schema converter to preserve `Decimal128(precision, scale)` type metadata instead of falling back to float64. \
+3. In Rust (`libarrow_exec/src/lib.rs`), update the execution loop to poll the atomic cancellation flag across batch processing iterations, release mutex locks safely on cancellation, and implement clear lock poisoning recovery during query handle re-initialization. \
+4. Rebuild the Rust dynamic library and Go flight server executable, then run the client benchmark suite.\
+"""
+
+verification_explanation = """\
+The verifier runs in a separate container and tests the rebuilt system against three independent axes of failure: \
+1) Exact 128-bit decimal arithmetic precision on financial benchmark datasets; \
+2) Tokio worker thread pool count stability after 50 rapid client query cancellations (verifying zero thread/memory leaks); \
+3) Post-cancellation query execution to ensure C-FFI mutexes recover cleanly from poisoned states.\
+"""
+
+relevant_experience = """\
+Author has extensive experience building high-throughput distributed systems, cross-language FFI bindings (Rust PyO3 / C-FFI), and Apache Arrow Flight services.\
+"""
+
+[verifier]
+timeout_sec = 600
+network_mode = "no-network"
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600
+network_mode = "no-network"
+
+[environment]
+network_mode = "public"
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+workdir = "/app"
